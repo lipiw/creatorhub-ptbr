@@ -1,5 +1,25 @@
 [
   [
+    "^(?:⚠️\\s*)?本机直连提醒[:：]\\s*(.+)$",
+    "⚠️ Aviso de conexão direta: $1"
+  ],
+  [
+    "^浏览器已打开\\s*[·•]\\s*(.+?)$",
+    "Navegador aberto · $1"
+  ],
+  [
+    "^(.+?)\\s*[·•]\\s*本机直连$",
+    "$1 · Conexão Direta (Local)"
+  ],
+  [
+    "^系统不强制拦截本机直连，单账号本地运营可正常使用；但若在「(.+?)」下同时运营多个账号，共用本机真实出口 IP 容易触发关联限流或设备安全验证。$",
+    "O sistema não bloqueia a conexão direta local (funciona normalmente para 1 conta); porém, operar várias contas no \"$1\" pelo mesmo IP real pode acionar limitação por associação ou verificação de segurança."
+  ],
+  [
+    "^(?:⚠️\\s*)?「(.+?)」属于海外平台，强烈建议绑定境外独立代理。本机直连可能受本地网络环境限制导致连接超时，且多账号共用同一 IP 易触发风控。$",
+    "⚠️ \"$1\" é uma rede internacional — recomenda-se vincular um proxy dedicado. A conexão direta pode sofrer limitações de rede e compartilhar o mesmo IP entre várias contas aumenta o risco de antifraude."
+  ],
+  [
     "^浏览器墙\\s*\\((\\d+)\\)$",
     "Parede de Navegadores ($1)"
   ],

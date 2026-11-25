@@ -29,7 +29,7 @@ ALL_KNOWN_PLATFORMS = {
     "youtube",
 }
 CJK_RE = re.compile(r"[\u4e00-\u9fff]")
-TRANSLATABLE_KEYS = {"detail", "message", "error", "status_label", "reason"}
+TRANSLATABLE_KEYS = {"detail", "message", "error", "status_label", "reason", "warning", "proxy_warning", "hint"}
 
 
 def _load_i18n():
