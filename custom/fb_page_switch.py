@@ -33,6 +33,57 @@ async def _click_first(page, selectors, timeout_ms=6000):
     return False
 
 
+class _RobustTyping:
+    """Proxy do engine humano: digita a legenda por linha (insert_text + Enter) e valida o resultado.
+    A digitacao tecla-a-tecla perdia trechos por causa do popup de hashtags do Facebook."""
+
+    def __init__(self, engine):
+        self._e = engine
+
+    def __getattr__(self, name):
+        return getattr(self._e, name)
+
+    async def type_text(self, locator, text, page=None, clear=False, timeout=5000, **kw):
+        if page is None:
+            return await self._e.type_text(locator, text, page=page, clear=clear, timeout=timeout, **kw)
+        await locator.click(timeout=timeout)
+        lines = str(text).replace(chr(13) + chr(10), chr(10)).split(chr(10))
+        for i, line in enumerate(lines):
+            if line:
+                await page.keyboard.insert_text(line)
+            if i < len(lines) - 1:
+                await page.keyboard.press("Enter")
+            await asyncio.sleep(0.15)
+        await page.keyboard.press("Space")  # fecha o typeahead de hashtag sem fechar o dialogo
+        await asyncio.sleep(0.8)
+        got = " ".join((await locator.inner_text()).split())
+        want = " ".join(str(text).split())
+        if got.rstrip() != want.rstrip() and got[:40] != want[:40]:
+            raise RuntimeError(f"legenda digitada divergente: {got[:80]!r}")
+        if len(got) < len(want) * 0.9:
+            raise RuntimeError(f"legenda incompleta ({len(got)}/{len(want)})")
+
+
+async def _latest_post_link(page, target_url: str) -> str:
+    """Recarrega a Pagina e le o post/Reel mais recente (o upstream lia a pagina sem recarregar e devolvia um post antigo)."""
+    try:
+        await asyncio.sleep(12)
+        await page.goto(target_url, wait_until="domcontentloaded", timeout=40000)
+        await asyncio.sleep(6)
+        await page.evaluate("window.scrollBy({top: 500, behavior: 'smooth'})")
+        await asyncio.sleep(2)
+        href = await page.evaluate(r"""() => {
+            for (const a of document.querySelectorAll('div[role="article"] a[href]')) {
+                const h = a.href || '';
+                if (/\/(posts|videos|reel|permalink\.php|photo|story\.php)\/?./i.test(h)) return h.split('?')[0];
+            }
+            return '';
+        }""")
+        return str(href or "").strip()
+    except Exception:
+        return ""
+
+
 def install() -> None:
     try:
         from app.browser import facebook_fetcher as ff
@@ -76,6 +127,20 @@ def install() -> None:
             for t in ("No que você está pensando", "Escreva algo", "Criar post", "Criar publicação", "O que você está pensando")
         )
         fbpub.COMPOSER_TRIGGER_SELECTORS = tuple(fbpub.COMPOSER_TRIGGER_SELECTORS) + extra
+        btn = ':visible:not([aria-disabled="true"])'
+        sub = tuple(
+            f'div[role="dialog"] div[aria-label="{t}"][role="button"]{btn}'
+            for t in ("Avançar", "Próximo", "Compartilhar", "Postar", "Publicar")
+        ) + tuple(
+            f'div[role="dialog"] div[role="button"]:has-text("{t}"){btn}'
+            for t in ("Avançar", "Compartilhar", "Publicar")
+        )
+        fbpub.COMPOSER_SUBMIT_BUTTON_SELECTORS = sub + tuple(fbpub.COMPOSER_SUBMIT_BUTTON_SELECTORS)  # PT primeiro: has-text("Post") casava com "Adicionar ao post"
+        fbpub.COMPOSER_PHOTO_BUTTON_SELECTORS = tuple(fbpub.COMPOSER_PHOTO_BUTTON_SELECTORS) + (
+            'div[role="dialog"] div[role="button"][aria-label*="Foto/vídeo" i]',
+        )
+        fbpub.DEFAULT_HUMAN_ENGINE = _RobustTyping(fbpub.DEFAULT_HUMAN_ENGINE)
+        fbpub._extract_latest_profile_post_link = _latest_post_link
     except Exception as exc:
         print(f"[fb-switch] seletores PT nao aplicados: {exc!r}")
     ff._ptbr_switch_patched = True

@@ -464,12 +464,18 @@ async def publish_facebook(
         btn_label = str(
             (await submit_btn.get_attribute("aria-label")) or (await submit_btn.inner_text()) or ""
         ).strip().lower()
-        if btn_label in {"next", "下一步"}:
+        # PT-BR patch: etapas "Avançar" (inclui fluxo de Reels, ate 4 etapas)
+        for _step in range(4):
+            if btn_label not in {"next", "下一步", "avançar", "avancar", "próximo", "proximo"}:
+                break
             await DEFAULT_HUMAN_ENGINE.click_locator(submit_btn, page=page, timeout=5000)
-            await human_wait(page, 1500)
-            submit_btn = await _find_first_visible(page, COMPOSER_SUBMIT_BUTTON_SELECTORS, timeout_ms=10000)
+            await human_wait(page, 2500)
+            submit_btn = await _find_first_visible(page, COMPOSER_SUBMIT_BUTTON_SELECTORS, timeout_ms=15000)
             if submit_btn is None:
                 return False, "", "进入下一步后未找到最终发布按钮"
+            btn_label = str(
+                (await submit_btn.get_attribute("aria-label")) or (await submit_btn.inner_text()) or ""
+            ).strip().lower()
 
         try:
             await DEFAULT_HUMAN_ENGINE.click_locator(submit_btn, page=page, timeout=5000)
@@ -490,6 +496,9 @@ async def publish_facebook(
             if not still_open:
                 break
             await human_wait(page, 1000)
+        else:
+            # PT-BR patch: dialogo continuou aberto => nao confirmou publicacao
+            return False, "", "write_uncertain:发帖弹窗在超时后仍未关闭，无法确认已发布"
 
         await human_wait(page, 2500)
         final_link = captured_post_url or captured_post_id
