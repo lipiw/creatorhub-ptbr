@@ -55,9 +55,27 @@ def install() -> None:
                 await asyncio.sleep(1.5)
                 await _click_first(page, CONFIRM_SELECTORS, 3000)
                 await asyncio.sleep(5)
+            try:  # fecha dialogos/popups que cobrem a Pagina (ex.: avisos, boas-vindas)
+                for _ in range(3):
+                    if not await page.locator('[role="dialog"]').count():
+                        break
+                    if not await _click_first(page, ('[role="dialog"] [aria-label="Fechar"]', '[role="dialog"] [aria-label="Close"]', '[role="dialog"] div[role="button"]:has-text("Agora não")', '[role="dialog"] div[role="button"]:has-text("Not now")'), 1500):
+                        await page.keyboard.press("Escape")
+                    await asyncio.sleep(1.2)
+            except Exception:
+                pass
         except Exception as exc:  # nao bloqueia: fluxo original segue
             print(f"[fb-switch] aviso: {exc!r}")
         return ok, err
 
     ff.switch_facebook_page_identity = patched
+    try:  # gatilhos do compositor em portugues (o upstream so tem EN/ZH)
+        from app.platforms.facebook import publish as fbpub
+        extra = tuple(
+            f'div[role="main"] div[role="button"]:has-text("{t}")'
+            for t in ("No que você está pensando", "Escreva algo", "Criar post", "Criar publicação", "O que você está pensando")
+        )
+        fbpub.COMPOSER_TRIGGER_SELECTORS = tuple(fbpub.COMPOSER_TRIGGER_SELECTORS) + extra
+    except Exception as exc:
+        print(f"[fb-switch] seletores PT nao aplicados: {exc!r}")
     ff._ptbr_switch_patched = True
