@@ -34,8 +34,13 @@
 
     for (let i = 0; i < REGEXES.length; i++) {
       const [re, tpl] = REGEXES[i];
-      if (re.test(norm)) {
-        const replaced = norm.replace(re, tpl);
+      const match = norm.match(re);
+      if (match) {
+        const replaced = tpl.replace(/\$(\d+|\$)/g, (_, grp) => {
+          if (grp === "$") return "$";
+          const val = match[Number(grp)] || "";
+          return CJK_RE.test(val) ? translateText(val) : val;
+        });
         if (replaced !== norm) {
           const lead = raw.match(/^\s*/)[0];
           const trail = raw.match(/\s*$/)[0];
@@ -301,7 +306,14 @@
     const observer = new MutationObserver((mutations) => {
       if (isMutatingDom) return;
       for (const m of mutations) {
-        if (m.type === "characterData") {
+        if (m.type === "attributes" && m.target && m.target.nodeType === Node.ELEMENT_NODE) {
+          isMutatingDom = true;
+          try {
+            translateAttrs(m.target);
+          } finally {
+            isMutatingDom = false;
+          }
+        } else if (m.type === "characterData") {
           const p = m.target.parentElement;
           if (!p || !tryTranslateInlineContainer(p)) {
             translateNodeTree(m.target);
@@ -317,7 +329,13 @@
         }
       }
     });
-    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+      attributes: true,
+      attributeFilter: ["placeholder", "title", "aria-label", "data-tooltip", "data-title", "data-base-label"],
+    });
   }
 
   if (document.readyState === "loading") {

@@ -1,5 +1,17 @@
 [
   [
+    "^搜索(.+)$",
+    "Buscar $1"
+  ],
+  [
+    "^搜索已加载的(.+)$",
+    "Buscar em: $1"
+  ],
+  [
+    "^浏览器墙\\s*\\((\\d+)\\)$",
+    "Parede de Navegadores ($1)"
+  ],
+  [
     "^1\\.\\s*选择分发目标账号（已选\\s*(.+?)\\s*个账号，跨\\s*(.+?)\\s*个平台）$",
     "1. Selecionar contas de destino ($1 conta(s), em $2 rede(s))"
   ],
