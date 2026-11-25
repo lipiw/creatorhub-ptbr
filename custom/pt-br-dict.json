@@ -5049,7 +5049,14 @@
     "搜索已加载的代理备注、地址或归属地": "Buscar proxies carregados",
     "跟随系统 · 当前": "Seguir sistema · Atual",
     "当前": "Atual",
-    "已应用于当前页面，浏览器未保存偏好": "Aplicado nesta página; o navegador não salvou a preferência"
+    "已应用于当前页面，浏览器未保存偏好": "Aplicado nesta página; o navegador não salvou a preferência",
+    "浏览器已打开 ·": "Navegador aberto ·",
+    "请在可见窗口完成登录。": "Conclua o login na janela visível do navegador.",
+    "请扫描浏览器中的验证二维码，验证通过后会自动继续登录。": "Escaneie o QR code de verificação no navegador; após validar, o login continuará automaticamente.",
+    "本机直连提醒：当前未绑定代理，海外平台直连可能受网络环境限制或暴露真实 IP，建议配置境外住宅代理": "Aviso de conexão direta: nenhum proxy vinculado. Conectar diretamente em redes internacionais pode expor seu IP real; recomenda-se configurar um proxy residencial/ISP.",
+    "⚠️ 本机直连提醒：当前未绑定代理，海外平台直连可能受网络环境限制或暴露真实 IP，建议配置境外住宅代理": "⚠️ Aviso de conexão direta: nenhum proxy vinculado. Conectar diretamente em redes internacionais pode expor seu IP real; recomenda-se configurar um proxy residencial/ISP.",
+    "本机直连提醒：同平台已有其他账号，当前账号走本机真实 IP，建议按需绑定独立代理以降低关联风险": "Aviso de conexão direta: já existem outras contas nesta rede e esta usa o IP local real. Recomenda-se vincular um proxy dedicado para reduzir risco de associação.",
+    "⚠️ 本机直连提醒：同平台已有其他账号，当前账号走本机真实 IP，建议按需绑定独立代理以降低关联风险": "⚠️ Aviso de conexão direta: já existem outras contas nesta rede e esta usa o IP local real. Recomenda-se vincular um proxy dedicado para reduzir risco de associação."
   },
   "phrases": []
 }
