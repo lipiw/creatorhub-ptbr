@@ -1,12 +1,11 @@
 """Plugin desacoplado para manter CreatorHub em Portugues (PT-BR) e restrito a 4 redes
 (Facebook, Instagram, TikTok, YouTube) sem editar dezenas de arquivos do repositorio oficial.
-
-Instalado com apenas 2 linhas em `app/main.py`, preservando merges limpos com `upstream/main`.
 """
 from __future__ import annotations
 
 import json
 import os
+import re
 from pathlib import Path
 
 from fastapi import FastAPI, Request
@@ -29,6 +28,48 @@ ALL_KNOWN_PLATFORMS = {
     "facebook",
     "youtube",
 }
+CJK_RE = re.compile(r"[\u4e00-\u9fff]")
+TRANSLATABLE_KEYS = {"detail", "message", "error", "status_label", "reason"}
+
+
+def _load_i18n():
+    exact: dict[str, str] = {}
+    phrases: list[tuple[str, str]] = []
+    regexes: list[tuple[re.Pattern[str], str]] = []
+    try:
+        d = json.loads((CUSTOM_DIR / "pt-br-dict.json").read_text(encoding="utf-8"))
+        exact = d.get("exact") or {}
+        phrases = sorted(((p[0], p[1]) for p in (d.get("phrases") or [])), key=lambda x: len(x[0]), reverse=True)
+    except Exception:
+        pass
+    try:
+        r_list = json.loads((CUSTOM_DIR / "pt-br-regex.json").read_text(encoding="utf-8"))
+        for pat, tpl in r_list:
+            # Converte $1 para \1 do Python
+            py_tpl = re.sub(r"\$(\d+)", r"\\\1", tpl)
+            regexes.append((re.compile(pat), py_tpl))
+    except Exception:
+        pass
+    return exact, phrases, regexes
+
+
+EXACT_MAP, PHRASE_LIST, REGEX_LIST = _load_i18n()
+
+
+def _translate_str(s: str) -> str:
+    if not s or not CJK_RE.search(s):
+        return s
+    st = s.strip()
+    if st in EXACT_MAP:
+        return s.replace(st, EXACT_MAP[st])
+    for pat, tpl in REGEX_LIST:
+        if pat.search(st):
+            return s.replace(st, pat.sub(tpl, st))
+    out = s
+    for src, dst in PHRASE_LIST:
+        if src in out:
+            out = out.replace(src, dst)
+    return out
 
 
 def get_allowed_platforms() -> tuple[str, ...]:
@@ -39,22 +80,25 @@ def get_allowed_platforms() -> tuple[str, ...]:
     return items or DEFAULT_ALLOWED
 
 
-def _filter_json_platforms(obj, allowed: set[str]):
+def _transform_json(obj, allowed: set[str], filter_platforms: bool):
     if isinstance(obj, list):
         out = []
         for item in obj:
-            if isinstance(item, dict):
+            if filter_platforms and isinstance(item, dict):
                 pf = item.get("platform") or item.get("pf")
                 if isinstance(pf, str) and pf.lower() in ALL_KNOWN_PLATFORMS and pf.lower() not in allowed:
                     continue
-            out.append(_filter_json_platforms(item, allowed))
+            out.append(_transform_json(item, allowed, filter_platforms))
         return out
     if isinstance(obj, dict):
         new_d = {}
         for k, v in obj.items():
-            if isinstance(k, str) and k.lower() in ALL_KNOWN_PLATFORMS and k.lower() not in allowed:
+            if filter_platforms and isinstance(k, str) and k.lower() in ALL_KNOWN_PLATFORMS and k.lower() not in allowed:
                 continue
-            new_d[k] = _filter_json_platforms(v, allowed)
+            if isinstance(v, str) and k in TRANSLATABLE_KEYS:
+                new_d[k] = _translate_str(v)
+            else:
+                new_d[k] = _transform_json(v, allowed, filter_platforms)
         return new_d
     return obj
 
@@ -64,7 +108,6 @@ class PtBrAndPlatformOverlayMiddleware(BaseHTTPMiddleware):
         allowed = set(get_allowed_platforms())
         path = request.url.path
 
-        # Bloqueia criacao de contas/monitores para plataformas desativadas
         if path.startswith("/api/") and request.method in ("POST", "PUT", "PATCH"):
             q_pf = (request.query_params.get("platform") or "").strip().lower()
             if q_pf and q_pf in ALL_KNOWN_PLATFORMS and q_pf not in allowed:
@@ -74,9 +117,8 @@ class PtBrAndPlatformOverlayMiddleware(BaseHTTPMiddleware):
                 )
 
         response = await call_next(request)
-
-        # Injeta overlay PT-BR + filtro de 4 redes no HTML principal em memoria
         content_type = response.headers.get("content-type", "")
+
         if path in ("/", "/index.html") and "text/html" in content_type:
             body_chunks = [chunk async for chunk in response.body_iterator]
             html = b"".join(body_chunks).decode("utf-8", errors="replace")
@@ -94,20 +136,19 @@ class PtBrAndPlatformOverlayMiddleware(BaseHTTPMiddleware):
             headers.pop("content-length", None)
             return Response(content=html.encode("utf-8"), status_code=response.status_code, headers=headers, media_type="text/html")
 
-        # Filtra plataformas desativadas em respostas JSON de matriz/overview/resumo
-        if path.startswith("/api/") and "application/json" in content_type and response.status_code == 200:
-            if any(seg in path for seg in ("/matrix", "/overview", "/platforms", "/health", "/summary", "/accounts")):
-                body_chunks = [chunk async for chunk in response.body_iterator]
-                raw = b"".join(body_chunks)
-                try:
-                    data = json.loads(raw.decode("utf-8"))
-                    filtered = _filter_json_platforms(data, allowed)
-                    new_raw = json.dumps(filtered, ensure_ascii=False).encode("utf-8")
-                    headers = dict(response.headers)
-                    headers.pop("content-length", None)
-                    return Response(content=new_raw, status_code=200, headers=headers, media_type="application/json")
-                except Exception:
-                    return Response(content=raw, status_code=response.status_code, headers=dict(response.headers), media_type="application/json")
+        if path.startswith("/api/") and "application/json" in content_type:
+            filter_pf = any(seg in path for seg in ("/matrix", "/overview", "/platforms", "/health", "/summary", "/accounts"))
+            body_chunks = [chunk async for chunk in response.body_iterator]
+            raw = b"".join(body_chunks)
+            try:
+                data = json.loads(raw.decode("utf-8"))
+                transformed = _transform_json(data, allowed, filter_pf)
+                new_raw = json.dumps(transformed, ensure_ascii=False).encode("utf-8")
+                headers = dict(response.headers)
+                headers.pop("content-length", None)
+                return Response(content=new_raw, status_code=response.status_code, headers=headers, media_type="application/json")
+            except Exception:
+                return Response(content=raw, status_code=response.status_code, headers=dict(response.headers), media_type="application/json")
 
         return response
 

@@ -1,18 +1,25 @@
-/* CreatorHub Overlay PT-BR + Filtro de 4 Redes (Facebook, Instagram, TikTok, YouTube) */
+/* CreatorHub Overlay PT-BR + Regex Dinamico + Filtro de 4 Redes */
 (function () {
-  const ALLOWED = new Set(window.__CREATORHUB_ALLOWED_PLATFORMS__ || ["facebook", "instagram", "tiktok", "youtube"]);
   const HIDDEN_PFS = new Set(["douyin", "xhs", "rednote", "kuaishou", "shipinhao", "bilibili", "twitter"]);
   const HIDDEN_LABELS = ["抖音", "小红书", "海外小红书", "快手", "视频号", "哔哩哔哩", "Twitter", "B站", "Rednote"];
   const CJK_RE = /[\u4e00-\u9fff]/;
 
   let EXACT = {};
   let PHRASES = [];
+  let REGEXES = [];
 
   function translateText(raw) {
     if (!raw || !CJK_RE.test(raw)) return raw;
     const trimmed = raw.trim();
     if (Object.prototype.hasOwnProperty.call(EXACT, trimmed)) {
       return raw.replace(trimmed, EXACT[trimmed]);
+    }
+    for (let i = 0; i < REGEXES.length; i++) {
+      const [re, tpl] = REGEXES[i];
+      if (re.test(trimmed)) {
+        const replaced = trimmed.replace(re, tpl);
+        return raw.replace(trimmed, replaced);
+      }
     }
     let out = raw;
     for (let i = 0; i < PHRASES.length; i++) {
@@ -25,7 +32,6 @@
   function pruneHiddenPlatforms(root) {
     if (!root || !root.querySelectorAll) return;
 
-    // 1. Oculta opcoes de <select> para redes desativadas
     root.querySelectorAll("option").forEach((opt) => {
       const v = (opt.value || "").toLowerCase();
       if (HIDDEN_PFS.has(v)) {
@@ -35,7 +41,6 @@
       }
     });
 
-    // 2. Oculta botoes/cards/abas com data-pf ou data-platform desativado
     root.querySelectorAll("[data-pf], [data-platform]").forEach((el) => {
       const pf = (el.getAttribute("data-pf") || el.getAttribute("data-platform") || "").toLowerCase();
       if (HIDDEN_PFS.has(pf)) {
@@ -43,7 +48,6 @@
       }
     });
 
-    // 3. Oculta cards/chips React gerados dinamicamente com nome das redes chinesas/Twitter
     root.querySelectorAll("button, [role='tab'], .pf-card, .platform-card, .chip").forEach((el) => {
       if (el.closest(".pswitch")) return;
       const txt = (el.textContent || "").trim();
@@ -64,7 +68,7 @@
     const tag = root.tagName;
     if (tag === "SCRIPT" || tag === "STYLE" || tag === "CODE" || tag === "PRE") return;
 
-    for (const attr of ["placeholder", "title", "aria-label", "data-base-label"]) {
+    for (const attr of ["placeholder", "title", "aria-label", "data-base-label", "data-tooltip", "data-title"]) {
       const val = root.getAttribute(attr);
       if (val && CJK_RE.test(val)) {
         const next = translateText(val);
@@ -84,8 +88,8 @@
       if (next !== node.nodeValue) node.nodeValue = next;
     }
 
-    root.querySelectorAll("[placeholder], [title], [aria-label]").forEach((el) => {
-      for (const attr of ["placeholder", "title", "aria-label"]) {
+    root.querySelectorAll("[placeholder], [title], [aria-label], [data-tooltip], [data-title]").forEach((el) => {
+      for (const attr of ["placeholder", "title", "aria-label", "data-tooltip", "data-title"]) {
         const val = el.getAttribute(attr);
         if (val && CJK_RE.test(val)) {
           const next = translateText(val);
@@ -103,30 +107,45 @@
         localStorage.setItem("platform", "facebook");
       }
       if (typeof window.PLATFORM === "string" && HIDDEN_PFS.has(window.PLATFORM.toLowerCase())) {
-        if (typeof window.switchPlatform === "function") {
-          window.switchPlatform("facebook");
-        }
+        if (typeof window.switchPlatform === "function") window.switchPlatform("facebook");
       }
       const badge = document.getElementById("page-platform");
       if (badge && HIDDEN_LABELS.includes((badge.textContent || "").trim())) {
-        if (typeof window.switchPlatform === "function") {
-          window.switchPlatform("facebook");
-        }
+        if (typeof window.switchPlatform === "function") window.switchPlatform("facebook");
       }
     } catch (_) {}
   }
 
+  function auditRemainingCjk() {
+    if (!location.search.includes("debug_i18n=1")) return;
+    const found = new Set();
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+    let n;
+    while ((n = walker.nextNode())) {
+      const p = n.parentElement;
+      if (!p || p.offsetParent === null) continue;
+      if (CJK_RE.test(n.nodeValue || "")) found.add(n.nodeValue.trim());
+    }
+    if (found.size > 0) console.warn("[PT-BR i18n audit] Restantes visiveis:", Array.from(found));
+  }
+
   async function init() {
     try {
-      const res = await fetch("/custom/pt-br-dict.json", { cache: "no-cache" });
-      if (res.ok) {
-        const dict = await res.json();
+      const [dRes, rRes] = await Promise.all([
+        fetch("/custom/pt-br-dict.json", { cache: "no-cache" }),
+        fetch("/custom/pt-br-regex.json", { cache: "no-cache" }),
+      ]);
+      if (dRes.ok) {
+        const dict = await dRes.json();
         EXACT = dict.exact || {};
         PHRASES = (dict.phrases || []).sort((a, b) => b[0].length - a[0].length);
       }
+      if (rRes.ok) {
+        const regs = await rRes.json();
+        REGEXES = regs.map(([pat, tpl]) => [new RegExp(pat), tpl]);
+      }
     } catch (_) {}
 
-    // Intercepta toast() global para traduzir avisos dinamicos
     if (typeof window.toast === "function" && !window.toast.__ptbrWrapped) {
       const origToast = window.toast;
       window.toast = function (msg, kind, ...rest) {
@@ -135,10 +154,18 @@
       window.toast.__ptbrWrapped = true;
     }
 
+    const origAlert = window.alert;
+    window.alert = (msg) => origAlert.call(window, translateText(String(msg || "")));
+    const origConfirm = window.confirm;
+    window.confirm = (msg) => origConfirm.call(window, translateText(String(msg || "")));
+
     pruneHiddenPlatforms(document.body);
     translateNodeTree(document.body);
     ensureAllowedDefaultPlatform();
-    setTimeout(ensureAllowedDefaultPlatform, 400);
+    setTimeout(() => {
+      ensureAllowedDefaultPlatform();
+      auditRemainingCjk();
+    }, 500);
 
     const observer = new MutationObserver((mutations) => {
       for (const m of mutations) {
