@@ -1095,9 +1095,15 @@ async def fetch_facebook_comments(
     ctx = await mgr.context_for(identity)
     page = await ctx.new_page()
     comments_by_id: Dict[str, Dict[str, Any]] = {}
+    # Em Reels/videos o viewer avanca para o proximo Reel ao rolar; so vale o que
+    # foi carregado enquanto a URL ainda aponta para o post-alvo.
+    _scope_m = re.search(r"/(?:reel|reels|videos)/(\d+)", str(target_url or ""))
+    scope_id = _scope_m.group(1) if _scope_m else ""
 
     async def on_response(resp):
         try:
+            if scope_id and scope_id not in str(page.url or ""):
+                return
             if not any(h in str(resp.url or "") for h in GQL_ENDPOINT_HINTS) or resp.status >= 400:
                 return
             txt = await resp.text()
@@ -1142,6 +1148,8 @@ async def fetch_facebook_comments(
         prev_total = 0
         stagnant = 0
         for _ in range(max(1, min(int(max_scrolls or 6), 25))):
+            if scope_id and scope_id not in str(page.url or ""):
+                break  # o viewer saiu do Reel-alvo: nada mais daqui pertence ao post
             dlg_loc = page.locator('div[role="dialog"]')
             search_root = dlg_loc.last if await dlg_loc.count() else page
             # 点击「View more comments / 查看更多评论」
@@ -1222,7 +1230,7 @@ async def fetch_facebook_comments(
                 )
             except Exception:
                 scrolled_inner = 0
-            if not scrolled_inner:
+            if not scrolled_inner and not scope_id:
                 await _scroll_feed_down(page, distance=900)
             await human_wait(page, 1600)
 

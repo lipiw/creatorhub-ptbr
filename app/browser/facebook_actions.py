@@ -28,6 +28,7 @@ from app.platforms.facebook.resolve import normalize_facebook_url
 from app.platforms.facebook.selectors import (
     ADD_FRIEND_BUTTON_SELECTORS,
     COMMENT_OPEN_SELECTORS,
+    COMMENT_PRIVATE_REPLY_SELECTORS,
     COMMENT_SUBMIT_SELECTORS,
     COMMENT_TEXTBOX_SELECTORS,
     DM_COMPOSER_INPUT_SELECTORS,
@@ -40,6 +41,7 @@ from app.platforms.facebook.selectors import (
     JOIN_GROUP_BUTTON_SELECTORS,
     LIKE_BUTTON_SELECTORS,
     LIKE_PAGE_BUTTON_SELECTORS,
+    PRIVATE_REPLY_DIALOG_SELECTORS,
     PROFILE_MESSAGE_BUTTON_SELECTORS,
     REACTION_LABELS,
     SHARE_BUTTON_SELECTORS,
@@ -630,6 +632,152 @@ async def do_facebook_group_membership(
                 await page.close()
         except Exception:
             pass
+
+
+async def send_facebook_comment_dm(
+    mgr: BrowserManager,
+    identity: Identity,
+    post_url_raw: str,
+    comment_id: str,
+    user_ref: str,
+    text: str,
+    *,
+    page_id: str = "",
+    headed: bool = True,
+    on_submit: Optional[Callable[[], Any]] = None,
+) -> Tuple[bool, str, str]:
+    """DM ao autor de um comentario. Retorna (ok, erro, via).
+
+    1) tenta o botao de mensagem privada no proprio comentario (resposta privada);
+    2) se nao existir, cai para abrir o perfil do autor e clicar em Mensagem.
+    """
+    msg_text = str(text or "").strip()
+    if not msg_text:
+        return False, "Texto da DM vazio", ""
+    target_url = normalize_facebook_url(post_url_raw)
+    if not target_url.startswith(("http://", "https://")):
+        return False, "Link da postagem invalido", ""
+    if comment_id and "comment_id=" not in target_url:
+        sep = "&" if "?" in target_url else "?"
+        target_url = f"{target_url}{sep}comment_id={comment_id}"
+
+    ctx = await mgr.open_headed(identity) if headed else await mgr.context_for(identity)
+    page = await ctx.new_page()
+    switched_page = False
+    submitted = False
+    try:
+        if page_id:
+            await page.goto(FACEBOOK_BASE, wait_until="domcontentloaded", timeout=40000)
+            await human_wait(page, 1500)
+            await dismiss_facebook_overlays(page)
+            ok_sw, sw_err = await switch_facebook_page_identity(ctx, page, page_id)
+            if not ok_sw:
+                return False, sw_err, ""
+            switched_page = True
+
+        await page.goto(target_url, wait_until="domcontentloaded", timeout=45000)
+        await human_wait(page, 2600)
+        await dismiss_facebook_overlays(page)
+        health_err = await check_facebook_page_health(page)
+        if health_err:
+            return False, health_err, ""
+
+        if "/reel/" in str(page.url or "").lower():
+            tbox_check = await _find_first_visible(page, COMMENT_TEXTBOX_SELECTORS, timeout_ms=2000)
+            if tbox_check is None:
+                cbtn = await _find_first_visible(page, COMMENT_OPEN_SELECTORS, timeout_ms=5000)
+                if cbtn is not None:
+                    await DEFAULT_HUMAN_ENGINE.click_locator(cbtn, page=page, timeout=3000)
+                    await human_wait(page, 1600)
+
+        pm_btn = None
+        if comment_id:
+            block = page.locator(f'div[data-virtualized]:has(a[href*="{comment_id}"])').first
+            if await block.count():
+                for sel in COMMENT_PRIVATE_REPLY_SELECTORS:
+                    loc = block.locator(sel).first
+                    if await loc.count() and await loc.is_visible():
+                        pm_btn = loc
+                        break
+
+        if pm_btn is not None:
+            await DEFAULT_HUMAN_ENGINE.click_locator(pm_btn, page=page, timeout=4000)
+            await human_wait(page, 2200)
+            # SEGURANCA: so digita dentro do dialogo de chat. Nunca na caixa de comentario da pagina,
+            # senao o texto seria publicado como resposta publica ao comentario.
+            dialog = None
+            for dsel in PRIVATE_REPLY_DIALOG_SELECTORS:
+                cand = page.locator(dsel).last
+                try:
+                    await cand.wait_for(state="visible", timeout=8000)
+                    dialog = cand
+                    break
+                except Exception:
+                    continue
+            if dialog is None:
+                return False, "Dialogo de mensagem privada nao abriu; nada foi enviado", ""
+            textbox = dialog.locator('div[role="textbox"]').first
+            try:
+                await textbox.wait_for(state="visible", timeout=10000)
+            except Exception:
+                try:
+                    await page.screenshot(path=str(Path("logs") / "dm_dialog_debug.png"))
+                except Exception:
+                    pass
+                return False, "Caixa de mensagem privada nao encontrada no dialogo; nada foi enviado", ""
+            await DEFAULT_HUMAN_ENGINE.type_text(textbox, msg_text, page=page, clear=False, timeout=5000)
+            await human_wait(page, 800)
+            # A caixa e multilinha: Enter so quebra a linha. O envio e o botao "Enviar mensagem" do dialogo.
+            send_loc = None
+            for ssel in (
+                'div[role="button"][aria-label="Enviar mensagem"]',
+                'div[role="button"][aria-label="Send message"]',
+                'div[role="button"][aria-label="Enviar mensaje"]',
+            ):
+                cand_btn = dialog.locator(ssel).last
+                if await cand_btn.count():
+                    send_loc = cand_btn
+                    break
+            if send_loc is None:
+                return False, "Botao 'Enviar mensagem' do dialogo nao encontrado; nada foi enviado", ""
+            try:
+                await send_loc.click(timeout=4000)
+            except Exception:
+                # Em janelas pequenas o botao fica abaixo da dobra do dialogo fixo
+                await send_loc.evaluate("el => el.click()")
+            submitted = True
+            await _notify_submit(on_submit)
+            await human_wait(page, 3500)
+            health_err = await check_facebook_page_health(page)
+            if health_err:
+                return False, f"write_uncertain:{health_err}", "private_reply"
+            # Envio confirmado quando o dialogo fecha; se continuar aberto, o resultado e incerto
+            try:
+                still_open = await dialog.is_visible()
+            except Exception:
+                still_open = False
+            if still_open:
+                return False, "write_uncertain:o dialogo de mensagem continuou aberto apos clicar em enviar", "private_reply"
+            return True, "", "private_reply"
+    except Exception as exc:
+        prefix = "write_uncertain:" if submitted else ""
+        return False, f"{prefix}Falha na DM por comentario: {exc!r}", ""
+    finally:
+        if switched_page:
+            try:
+                await switch_facebook_page_identity(ctx, page, "")
+            except Exception:
+                pass
+        try:
+            if not page.is_closed():
+                await page.close()
+        except Exception:
+            pass
+
+    # SEGURANCA: sem o botao "Enviar mensagem" no comentario do post-alvo, nada e enviado.
+    # Nao ha fallback para o perfil do autor: a DM so existe como resposta a um comentario
+    # que realmente esta no post da Pagina.
+    return False, "Comentario ou botao 'Enviar mensagem' nao encontrado no post-alvo; nada foi enviado", ""
 
 
 async def send_facebook_dm(

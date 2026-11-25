@@ -85,9 +85,31 @@ class CommentRuleIn(BaseModel):
     max_per_run: int = 5
     interval_seconds: int = 1800
     enabled: bool = False
+    action: str = "reply"              # reply | dm
+    page_id: str = ""
+
+
+DM_MIN_GAP_SECONDS = 180
+DM_MAX_DAILY_CAP = 30
+DM_DEFAULT_DAILY_CAP = 10
+
+
+def _normalize_action(action: str | None) -> str:
+    return "dm" if str(action or "").strip().lower() == "dm" else "reply"
+
+
+def _check_dm_rule(platform: str, mode: str, templates: list[str]) -> None:
+    from app.platforms.facebook.dm_policy import validate_dm_templates
+    if platform != "facebook" or mode != "auto_reply":
+        raise HTTPException(400, "DM por comentario so esta disponivel para respostas automaticas do Facebook")
+    err = validate_dm_templates(templates)
+    if err:
+        raise HTTPException(400, err)
 
 
 class CommentRuleUpdate(BaseModel):
+    action: str | None = None
+    page_id: str | None = None
     name: str | None = None
     templates: list[str] | None = None
     use_ai: bool | None = None
@@ -156,6 +178,8 @@ def _rule_dict(r: CommentRule) -> dict:
         "daily_cap": r.daily_cap, "min_gap_seconds": r.min_gap_seconds,
         "max_per_run": r.max_per_run, "interval_seconds": r.interval_seconds,
         "enabled": r.enabled, "last_error": r.last_error,
+        "action": _normalize_action(getattr(r, "action", "reply")),
+        "page_id": getattr(r, "page_id", "") or "",
         "last_run_at": r.last_run_at.isoformat() if r.last_run_at else None,
         "next_auto_run_at": utc_iso(row_deadline(r, app_runtime.cfg, kind="comment_rule")),
     }
@@ -352,6 +376,17 @@ async def add_comment_rule(body: CommentRuleIn, request: Request = None):
     mode = body.mode if body.mode in ("auto_reply", "auto_comment") else "auto_reply"
     compose_mode, use_ai = _normalize_compose_mode(body.compose_mode, body.use_ai)
     templates = [t.strip() for t in body.templates if t.strip()]
+    action = _normalize_action(body.action)
+    page_id = (body.page_id or "").strip()[:80]
+    if action == "dm":
+        _check_dm_rule(platform, mode, templates)
+        compose_mode, use_ai = "template_only", False
+        body.require_review = True          # primeira semana: revisao manual obrigatoria na criacao
+        body.min_gap_seconds = max(DM_MIN_GAP_SECONDS, body.min_gap_seconds)
+        body.daily_cap = min(DM_MAX_DAILY_CAP, body.daily_cap or DM_DEFAULT_DAILY_CAP)
+        body.max_per_run = min(body.max_per_run, 5)
+        if not body.max_source_age_hours:
+            body.max_source_age_hours = 72
     if compose_mode in ("template_only", "ai_with_fallback") and not templates:
         raise HTTPException(400, "当前文案模式需至少配置一条文案模板（纯 AI 模式可在上方切换为「仅 AI」）")
 
@@ -418,6 +453,7 @@ async def add_comment_rule(body: CommentRuleIn, request: Request = None):
                 min_gap_seconds=max(1, body.min_gap_seconds),
                 max_per_run=max(1, min(100, body.max_per_run)),
                 interval_seconds=max(60, body.interval_seconds),
+                action=action, page_id=page_id,
                 enabled=body.enabled)
             s.add(r); s.flush()
             return _rule_dict(r)
@@ -479,6 +515,18 @@ async def update_comment_rule(rid: int, body: CommentRuleUpdate):
         if body.name is not None:
             r.name = body.name.strip()[:100] or r.name
 
+        if body.action is not None:
+            r.action = _normalize_action(body.action)
+        if body.page_id is not None:
+            r.page_id = body.page_id.strip()[:80]
+        is_dm = _normalize_action(getattr(r, "action", "reply")) == "dm"
+        if is_dm:
+            body.compose_mode, body.use_ai = "template_only", False
+            body.min_gap_seconds = max(DM_MIN_GAP_SECONDS, body.min_gap_seconds or r.min_gap_seconds or 0)
+            body.daily_cap = min(DM_MAX_DAILY_CAP, body.daily_cap if body.daily_cap is not None else (r.daily_cap or DM_DEFAULT_DAILY_CAP))
+            if body.daily_cap == 0:
+                body.daily_cap = DM_DEFAULT_DAILY_CAP
+
         cur_cm = effective_compose_mode(r)
         if body.compose_mode is not None or body.use_ai is not None:
             next_cm, next_use_ai = _normalize_compose_mode(body.compose_mode, body.use_ai, fallback=cur_cm)
@@ -492,6 +540,8 @@ async def update_comment_rule(rid: int, body: CommentRuleUpdate):
         )
         if next_cm in ("template_only", "ai_with_fallback") and not next_templates:
             raise HTTPException(400, "当前文案模式需要至少保留一条本地模板")
+        if is_dm:
+            _check_dm_rule(r.platform, r.mode, next_templates)
 
         r.compose_mode = next_cm
         r.use_ai = next_use_ai
@@ -627,6 +677,7 @@ async def duplicate_comment_rule(rid: int, body: DuplicateRuleIn | None = None):
             daily_cap=src.daily_cap, min_gap_seconds=src.min_gap_seconds,
             max_per_run=src.max_per_run, interval_seconds=src.interval_seconds,
             require_review=src.require_review, enabled=False,
+            action=getattr(src, "action", "reply"), page_id=getattr(src, "page_id", ""),
         )
         s.add(cloned); s.commit(); s.refresh(cloned)
         return _rule_dict(cloned)
@@ -662,11 +713,32 @@ async def list_comment_tasks(platform: str | None = None, rule_id: int | None = 
         return [metadata_service._task_dict(t) for t in rows]
 
 
+@router.get("/api/dm-stats")
+async def dm_stats(rule_id: int | None = None):
+    """Funil simples: DMs enviadas hoje, total e fila por status (tarefas kind=dm)."""
+    from datetime import datetime, timedelta
+    from sqlalchemy import func
+    from app.models import DmSentLog
+    since = datetime.utcnow() - timedelta(days=1)
+    with get_session() as s:
+        q = select(CommentTask.status, func.count()).where(CommentTask.kind == "dm")
+        if rule_id is not None:
+            q = q.where(CommentTask.rule_id == rule_id)
+        by_status = {st: n for st, n in s.exec(q.group_by(CommentTask.status)).all()}
+        total_sent = s.exec(select(func.count()).select_from(DmSentLog)).one()
+        last_24h = s.exec(select(func.count()).select_from(DmSentLog).where(DmSentLog.sent_at >= since)).one()
+    return {"by_status": by_status, "sent_total": int(total_sent), "sent_24h": int(last_24h)}
+
+
 @router.post("/api/comment-tasks/{tid}/regenerate")
 async def regenerate_comment_task_now(tid: int):
     """使用 AI 重新生成单条草稿/待发/失败任务的文案。"""
     if not app_runtime.engine:
         raise HTTPException(503, "引擎未就绪")
+    with get_session() as s:
+        _t = s.get(CommentTask, tid)
+        if _t is not None and (getattr(_t, "kind", "comment") or "comment") == "dm":
+            raise HTTPException(400, "DMs usam apenas texto de modelo; edite o texto manualmente")
     res = await app_runtime.engine.regenerate_comment_task(tid)
     if not res.get("ok"):
         raise HTTPException(400, res.get("error") or "AI 重写失败")
@@ -722,7 +794,12 @@ async def edit_comment_task(tid: int, body: TaskContentIn):
             raise HTTPException(404)
         if t.status not in ("draft", "pending", "failed"):
             raise HTTPException(400, f"任务状态为 {t.status},不可编辑")
-        t.content = content[:300]
+        if (getattr(t, "kind", "comment") or "comment") == "dm":
+            from app.platforms.facebook.dm_policy import validate_dm_templates
+            err = validate_dm_templates([content])
+            if err:
+                raise HTTPException(400, err)
+        t.content = content[:600 if (getattr(t, "kind", "comment") or "comment") == "dm" else 300]
         if getattr(t, "content_source", "") == "ai_empty_draft":
             t.content_source = "manual"
             t.ai_error = ""

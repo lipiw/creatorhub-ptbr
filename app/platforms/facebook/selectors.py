@@ -261,6 +261,22 @@ PROFILE_MESSAGE_BUTTON_SELECTORS = (
     'div[role="main"] div[role="button"][aria-label*="mensaje" i]',
 )
 
+# Botao "Mensagem / Enviar mensagem privada" dentro do bloco de um comentario (visao de Pagina)
+COMMENT_PRIVATE_REPLY_SELECTORS = (
+    'div[role="button"]:text-is("Enviar mensagem")',
+    'div[role="button"]:text-is("Send message")',
+    'div[role="button"]:text-is("Enviar mensaje")',
+    'div[role="button"]:text-is("Message")',
+    'div[role="button"]:text-is("Mensagem")',
+)
+
+# Dialogo de chat aberto pelo botao acima ("Enviar mensagem para <nome>")
+PRIVATE_REPLY_DIALOG_SELECTORS = (
+    'div[role="dialog"][aria-label^="Enviar mensagem para"]',
+    'div[role="dialog"][aria-label^="Send message to"]',
+    'div[role="dialog"][aria-label^="Enviar mensaje a"]',
+)
+
 DM_COMPOSER_INPUT_SELECTORS = (
     'div[role="main"] div[role="textbox"][contenteditable="true"]',
     'div[aria-label*="Message" i] div[role="textbox"][contenteditable="true"]',

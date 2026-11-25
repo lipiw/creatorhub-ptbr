@@ -21,7 +21,7 @@ from app.db import get_session
 from app.engine import compose
 from app.engine.cadence import bounded_ratio
 from app.engine.monitor_helpers import log
-from app.models import CommentRule, CommentTask, DouyinAccount
+from app.models import CommentRule, CommentTask, DmSentLog, DouyinAccount
 from app.platforms.bilibili import BilibiliClient, parse_bili_aweme
 from app.platforms.douyin import parse_comment, parse_creator_comment
 from app.platforms.instagram import InstagramClient, parse_ig_aweme
@@ -461,7 +461,16 @@ class CommentRuleRunnerMixin:
                 ai_preset_id=str(getattr(r, "ai_preset_id", "") or "").strip(),
                 ai_prompt=str(getattr(r, "ai_prompt", "") or "").strip(),
                 ai_max_chars=max(0, int(getattr(r, "ai_max_chars", 0) or 0)),
+                action=("dm" if str(getattr(r, "action", "") or "").strip().lower() == "dm" else "reply"),
+                page_id=str(getattr(r, "page_id", "") or "").strip(),
             )
+            if rf["action"] == "dm":
+                # DM usa so texto de modelo (nunca IA) e so faz sentido ao responder a comentarios proprios
+                rf["compose_mode"] = cm = "template_only"
+                if r.mode != "auto_reply" or r.platform != "facebook":
+                    if not dry_run:
+                        self._mark_rule(rule_id, "DM por comentario so funciona em regras de resposta automatica do Facebook")
+                    return {"ok": False, "error": "DM por comentario so funciona em regras de resposta automatica do Facebook"}
             templates = compose.parse_templates(r.templates)
             acc = s.get(DouyinAccount, r.account_id) if r.account_id else None
             rf["account_uid"] = acc.uid if acc else ""
@@ -584,6 +593,24 @@ class CommentRuleRunnerMixin:
                 .where(CommentTask.status.in_(_ACTIVE_QUOTA_STATUSES))
             ).all())
 
+            # DM: no maximo 1 por pessoa por conta (enviadas + ja enfileiradas)
+            dm_done_users: set[str] = set()
+            if rf["action"] == "dm":
+                dm_done_users = {
+                    str(u) for u in s.exec(
+                        select(DmSentLog.commenter_id)
+                        .where(DmSentLog.account_id == rf["account_id"])
+                    ).all() if u
+                }
+                dm_done_users |= {
+                    str(u) for u in s.exec(
+                        select(CommentTask.target_user_id)
+                        .where(CommentTask.account_id == rf["account_id"])
+                        .where(CommentTask.kind == "dm")
+                        .where(CommentTask.status.in_(_ACTIVE_QUOTA_STATUSES))
+                    ).all() if u
+                }
+
             # 读取近期已生成文案用于 AI 避重
             recent_rows = s.exec(
                 select(CommentTask.content)
@@ -614,6 +641,7 @@ class CommentRuleRunnerMixin:
             skip = {
                 "dup": 0, "skip_kw": 0, "filter": 0, "scope": 0,
                 "short": 0, "age": 0, "ai_fail": 0, "empty": 0, "cap": 0,
+                "no_user": 0, "dm_dup": 0,
             }
             ai_consecutive_fail = 0
 
@@ -628,6 +656,15 @@ class CommentRuleRunnerMixin:
                 if rf["mode"] == "auto_comment" and c["aweme_id"] in acct_commented:
                     skip["dup"] += 1
                     continue
+
+                dm_user = str(c.get("target_user_id") or "").strip()
+                if rf["action"] == "dm":
+                    if not dm_user:
+                        skip["no_user"] += 1
+                        continue
+                    if dm_user in dm_done_users or (rf["page_id"] and dm_user == rf["page_id"]):
+                        skip["dm_dup"] += 1
+                        continue
 
                 if rf["mode"] == "auto_reply" and rf["comment_scope"] != "all":
                     is_reply = bool(c.get("is_reply"))
@@ -736,6 +773,8 @@ class CommentRuleRunnerMixin:
                         "work_desc": (c.get("work_desc") or "")[:200],
                         "target_comment_id": c.get("target_comment_id", ""),
                         "target_nick": c.get("target_nick", ""),
+                        "target_user_id": dm_user,
+                        "kind": "dm" if rf["action"] == "dm" else "comment",
                         "source_text": text_blob[:200],
                         "content": content,
                         "content_source": content_source,
@@ -759,7 +798,12 @@ class CommentRuleRunnerMixin:
                         method="manual" if xhs_manual_only else "",
                         scheduled_at=sched,
                         status=status,
+                        kind=rf["action"] if rf["action"] == "dm" else "comment",
+                        target_user_id=dm_user if rf["action"] == "dm" else "",
+                        page_id=rf["page_id"],
                     ))
+                if rf["action"] == "dm":
+                    dm_done_users.add(dm_user)
                 existing.add(key)
                 if rf["mode"] == "auto_comment":
                     acct_commented.add(c["aweme_id"])
@@ -784,6 +828,10 @@ class CommentRuleRunnerMixin:
                 parts.append(f'{skip["ai_fail"]}条 AI 生成失败跳过')
             if skip["empty"]:
                 parts.append(f'{skip["empty"]}条文案渲染为空')
+            if skip["no_user"]:
+                parts.append(f'{skip["no_user"]} comentarios sem id do autor (DM ignorada)')
+            if skip["dm_dup"]:
+                parts.append(f'{skip["dm_dup"]} autores ja receberam DM')
             if skip["cap"]:
                 parts.append(f'{skip["cap"]}条超出本轮上限/每日上限')
             note = "；".join(parts)
@@ -1355,7 +1403,8 @@ class CommentRuleRunnerMixin:
                 wid = rf["aweme_id"]
                 works_to_check_fb = [(wid, wid if str(wid).startswith("http") else fb_post_url(wid), "")]
             else:
-                target_self = acc_sec_uid or acc_uid
+                # Agindo como Pagina: os posts a monitorar sao os da Pagina, nao os do perfil pessoal
+                target_self = rf.get("page_id") or acc_sec_uid or acc_uid
                 if not target_self and state and fb_mode in {"api", "hybrid"}:
                     fcli_self = self._make_facebook_client(identity, state=state, proxy=proxy)
                     if fcli_self.has_login_cookies:
@@ -1410,13 +1459,19 @@ class CommentRuleRunnerMixin:
                     ct = int(c.get("create_time") or 0)
                     if comment_cutoff and ct and ct < comment_cutoff:
                         continue
-                    if self._is_self_comment(c, acc_nick, acc_sec_uid, acc_uid):
+                    # Agindo como Pagina (page_id), o perfil pessoal da conta nao e o autor da resposta:
+                    # so ignoramos comentarios da propria Pagina.
+                    if rf.get("page_id"):
+                        if str(c.get("user_sec_uid") or "") == rf["page_id"]:
+                            continue
+                    elif self._is_self_comment(c, acc_nick, acc_sec_uid, acc_uid):
                         continue
                     cands.append({
                         "aweme_id": purl,
                         "xsec_token": "",
                         "target_comment_id": cid,
                         "target_nick": c.get("user_nickname", ""),
+                        "target_user_id": str(c.get("user_sec_uid") or ""),
                         "ctx": {"nick": c.get("user_nickname", ""), "work_title": wdesc[:60]},
                         "source_text": c.get("text", ""),
                         "work_desc": wdesc,

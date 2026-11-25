@@ -48,7 +48,8 @@ from .facebook_fetcher import (fetch_facebook_user_posts, fetch_facebook_search,
                                fetch_facebook_dm_history)
 from .facebook_actions import (post_facebook_comment, do_facebook_like,
                                do_facebook_share, do_facebook_follow,
-                               do_facebook_group_membership, send_facebook_dm)
+                               do_facebook_group_membership, send_facebook_dm,
+                               send_facebook_comment_dm)
 from .youtube_fetcher import (fetch_youtube_channel_videos, fetch_youtube_search,
                               fetch_youtube_channels_search, fetch_youtube_video_detail,
                               fetch_youtube_comments, fetch_youtube_self_profile,
@@ -106,6 +107,7 @@ __all__ = ["BrowserManager", "cookie_string_to_state",
            "fetch_facebook_pages", "fetch_facebook_groups",
            "fetch_facebook_follows", "fetch_facebook_dm_conversations",
            "fetch_facebook_dm_history", "post_facebook_comment",
+           "send_facebook_comment_dm",
            "do_facebook_like", "do_facebook_share",
            "do_facebook_follow", "do_facebook_group_membership",
            "send_facebook_dm",

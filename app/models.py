@@ -4,7 +4,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Index
+from sqlalchemy import Index, UniqueConstraint
 from sqlmodel import Field, SQLModel
 
 
@@ -740,6 +740,9 @@ class CommentRule(SQLModel, table=True):
     interval_seconds: int = 1800         # 规则多久跑一轮(发现+生成任务)
     require_review: bool = False         # 草稿审核:生成的任务为 draft,人工通过后才发
     enabled: bool = False                # 默认关,确认无误再开
+    # reply = responde o comentario; dm = envia DM ao autor do comentario (templates = texto da DM)
+    action: str = "reply"
+    page_id: str = ""                    # Facebook: id/slug da Pagina para atuar como Pagina (vazio = perfil)
     last_run_at: Optional[datetime] = None
     last_error: str = ""
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -772,8 +775,24 @@ class CommentTask(SQLModel, table=True):
     blocked_at: Optional[datetime] = None
     next_allowed_at: Optional[datetime] = Field(default=None, index=True)
     method: str = ""               # 实际走的通道:manual | api | browser
+    kind: str = "comment"          # comment | dm (DM ao autor do comentario)
+    target_user_id: str = ""       # dm: id/slug do perfil do autor do comentario
+    page_id: str = ""              # Facebook: Pagina pela qual agir
     created_at: datetime = Field(default_factory=datetime.utcnow)
     done_at: Optional[datetime] = None
+
+
+class DmSentLog(SQLModel, table=True):
+    """Registro de DMs enviadas a autores de comentarios: no maximo 1 por pessoa por conta."""
+    __table_args__ = (UniqueConstraint("account_id", "commenter_id", name="uq_dmsent_account_commenter"),)
+    id: Optional[int] = Field(default=None, primary_key=True)
+    platform: str = Field(default="facebook", index=True)
+    account_id: int = Field(index=True)
+    page_id: str = ""
+    commenter_id: str = Field(default="", index=True)
+    comment_id: str = ""
+    task_id: Optional[int] = None
+    sent_at: datetime = Field(default_factory=datetime.utcnow)
 
 
 # ─────────── 本账号管理(作品 / 关注 / 粉丝 / 私信)───────────

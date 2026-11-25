@@ -444,6 +444,15 @@
                   <option value="all">不过滤（忽略下方包含词）</option>
                 </select>
               </div>
+              <div class="form-field" id="ac-action-wrap">
+                <label for="ac-action">Ação ao achar um comentário (Facebook)</label>
+                <select id="ac-action">
+                  <option value="reply">Responder o comentário</option>
+                  <option value="dm">Enviar DM ao autor (o texto acima vira a mensagem da DM)</option>
+                </select>
+                <input id="ac-page-id" placeholder="ID/slug da Página (opcional, para agir como a Página)" />
+                <div class="hint">DM: máx. 1 por pessoa, intervalo ≥ 3 min, revisão manual ao criar. Sem promessas de saúde/ganho.</div>
+              </div>
               <div class="form-field" id="ac-scope-wrap">
                 <label for="ac-comment-scope">评论层级过滤</label>
                 <select id="ac-comment-scope">

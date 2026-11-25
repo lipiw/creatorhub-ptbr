@@ -262,6 +262,8 @@ def _task_dict(t: CommentTask) -> dict:
         "content": t.content,
         "content_source": getattr(t, "content_source", ""),
         "ai_error": getattr(t, "ai_error", ""),
+        "kind": getattr(t, "kind", "comment") or "comment",
+        "target_user_id": getattr(t, "target_user_id", ""),
         "status": t.status, "result": t.result,
         "error": t.error, "method": t.method,
         "scheduled_at": t.scheduled_at.isoformat() if t.scheduled_at else None,

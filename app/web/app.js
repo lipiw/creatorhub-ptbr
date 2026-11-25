@@ -13479,8 +13479,13 @@ async function addCommentRule() {
     min_gap_seconds: Math.max(1, Number($("ac-gap").value) || 90),
     max_per_run: Math.max(1, Number($("ac-max").value) || 5),
     interval_seconds: Math.max(60, Number($("ac-interval").value) || 1800),
+    action: PLATFORM === "facebook" ? ($("ac-action")?.value || "reply") : "reply",
+    page_id: ($("ac-page-id")?.value || "").trim(),
     enabled: false,
   };
+  if (body.action === "dm") {
+    body.compose_mode = "template_only"; body.use_ai = false; body.mode = "auto_reply";
+  }
   await withBusy(evtBtn(), "创建中", async () => {
     try {
       await api("/api/comment-rules", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -13699,6 +13704,7 @@ async function refreshCommentRules() {
     const badges = [
       `<span class="pill ${acUsesAi(cm) ? "downloading" : "skipped"} bare" style="font-size:10px">${esc(AC_COMPOSE_T[cm] || cm)}</span>`,
       presetName ? `<span class="pill bare" style="font-size:10px">${esc(presetName)}</span>` : "",
+      r.action === "dm" ? `<span class="pill bare" style="font-size:10px">DM ao autor</span>` : "",
       r.require_review ? `<span class="pill pending bare" style="font-size:10px">草稿审核</span>` : "",
       (r.include_keywords?.length) ? `<span class="pill bare" style="font-size:10px">含 ${r.include_keywords.length} 词</span>` : "",
       (r.comment_scope && r.comment_scope !== "all" && r.mode === "auto_reply") ? `<span class="pill bare" style="font-size:10px">${esc(AC_SCOPE_T[r.comment_scope] || r.comment_scope)}</span>` : "",

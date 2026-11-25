@@ -4,7 +4,9 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 
 from app.account_lifecycle import AccountUnavailableError
-from app.browser import douyin_secure_post_api, post_bili_comment, post_channels_comment, post_comment_browser, post_facebook_comment, post_ig_comment, post_ks_comment, post_twitter_comment, post_youtube_comment
+from sqlmodel import select
+
+from app.browser import send_facebook_comment_dm, douyin_secure_post_api, post_bili_comment, post_channels_comment, post_comment_browser, post_facebook_comment, post_ig_comment, post_ks_comment, post_twitter_comment, post_youtube_comment
 from app.browser.tiktok_actions import post_tiktok_comment
 from app.db import get_session
 from app.engine.monitor_helpers import _AccountCheckBusy, log
@@ -90,7 +92,30 @@ class CommentTaskRunnerMixin:
             target_url = getattr(t, "target_url", "") or ""
             target_cid, target_nick = t.target_comment_id, t.target_nick
             target_text = getattr(t, "target_text", "") or ""
+            task_kind = getattr(t, "kind", "comment") or "comment"
+            dm_user = getattr(t, "target_user_id", "") or ""
+            task_page_id = getattr(t, "page_id", "") or ""
             content = (t.content or "").strip()
+            if task_kind == "dm":
+                # Revalida no momento do envio: 1 DM por pessoa por conta + texto sem termos de risco
+                from app.models import DmSentLog
+                from app.platforms.facebook.dm_policy import find_forbidden_terms
+                if not dm_user:
+                    t.status = "failed"; t.error = "Autor do comentario sem id: DM ignorada"
+                    s.add(t); s.commit()
+                    return {"ok": False, "error": t.error}
+                already = s.exec(
+                    select(DmSentLog.id).where(DmSentLog.account_id == t.account_id)
+                    .where(DmSentLog.commenter_id == dm_user)).first()
+                if already is not None:
+                    t.status = "canceled"; t.error = "Essa pessoa ja recebeu uma DM"
+                    s.add(t); s.commit()
+                    return {"ok": False, "error": t.error}
+                bad = find_forbidden_terms(content)
+                if bad:
+                    t.status = "draft"; t.error = "Texto com termos de risco: " + ", ".join(bad)
+                    s.add(t); s.commit()
+                    return {"ok": False, "error": t.error}
             if not content:
                 t.status = "draft"
                 t.error = "评论文案为空，请先编辑文案或使用 AI 重写后再通过发送"
@@ -231,6 +256,32 @@ class CommentTaskRunnerMixin:
                     headed=(True if native_mode else self.cfg.engine.comment_browser_headed),
                     on_submit=lambda: self._mark_write_submit(CommentTask, task_id, channel="browser"),
                 )
+            elif platform == "facebook" and task_kind == "dm":
+                from app.platforms.facebook import post_url as fb_post_url
+                method = "browser"
+                fb_url = target_url or fb_post_url(aweme_id)
+                ok, err, via = await send_facebook_comment_dm(
+                    self.browser,
+                    identity,
+                    fb_url,
+                    target_cid,
+                    dm_user,
+                    content,
+                    page_id=task_page_id,
+                    headed=(True if native_mode else self.cfg.engine.comment_browser_headed),
+                    on_submit=lambda: self._mark_write_submit(CommentTask, task_id, channel="browser"),
+                )
+                result = via if ok else ""
+                if ok:
+                    method = f"browser:{via}"
+                    from app.models import DmSentLog
+                    with get_session() as s2:
+                        if not s2.exec(select(DmSentLog.id).where(DmSentLog.account_id == account_id)
+                                       .where(DmSentLog.commenter_id == dm_user)).first():
+                            s2.add(DmSentLog(platform="facebook", account_id=account_id,
+                                             page_id=task_page_id, commenter_id=dm_user,
+                                             comment_id=target_cid, task_id=task_id))
+                            s2.commit()
             elif platform == "facebook":
                 from app.platforms.facebook import post_url as fb_post_url
                 method = "browser"
