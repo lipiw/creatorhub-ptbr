@@ -1,0 +1,8 @@
+{
+  "DefaultNotificationsSetting": 2,
+  "DefaultGeolocationSetting": 2,
+  "TranslateEnabled": false,
+  "PasswordManagerEnabled": false,
+  "BrowserSignin": 0,
+  "MetricsReportingEnabled": false
+}

@@ -186,6 +186,8 @@ def cmd_schedule(a):
         options.setdefault("target_type", "page")
     if a.fb_target:
         options["target_type"] = a.fb_target
+    if a.ai_label is not None:
+        options["ai_label"] = a.ai_label  # sem a flag, vale o padrao do servidor (CREATORHUB_FB_AI_LABEL, ligado)
     if options and platform not in OPTIONS_FIELD:
         raise CliError(f"opcoes especificas nao se aplicam a plataforma '{platform}'")
 
@@ -275,6 +277,8 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--topics")
     s.add_argument("--fb-page-id", help="Facebook: publica como esta Pagina")
     s.add_argument("--fb-target", choices=["profile", "page", "group", "story"])
+    s.add_argument("--ai-label", action=argparse.BooleanOptionalAction, default=None,
+                   help="Facebook: marca (ou nao) o post como conteudo de IA; padrao = configuracao do servidor (ligado)")
     s.add_argument("--opt", action="append", help="opcao especifica da plataforma CHAVE=VALOR (repetivel)")
     s.add_argument("--new", action="store_true", help="forca nova tarefa mesmo com conteudo identico")
     s.set_defaults(fn=cmd_schedule)

@@ -85,6 +85,22 @@ python scripts/creatorhub_cli.py cancel 42
 - A API REST é a mesma que o painel usa (`/api/accounts`, `/api/publish`, ...), então
   qualquer agente com `curl -u admin:SENHA` também consegue.
 
+## Rótulo de IA (Facebook)
+
+Todo post do Facebook sai marcado como conteúdo de IA. O publicador abre "Criar post", clica em
+**Rótulo de IA**, liga **Adicionar rótulo de IA**, confirma em **Entendi** e só segue se o botão passar a
+dizer "Rótulo de IA ativado". Código: `custom/fb_page_switch.py` (overlay; o upstream não foi alterado).
+
+- Padrão: **ligado** (`CREATORHUB_FB_AI_LABEL=1`). Para desligar tudo: `CREATORHUB_FB_AI_LABEL=0` no `.env`.
+- Por post: `fb_options.ai_label` na API, ou `--ai-label` / `--no-ai-label` na CLI.
+- **À prova de falha** (`CREATORHUB_FB_AI_LABEL_STRICT=1`): se o rótulo foi pedido e não pôde ser confirmado
+  (o Facebook mudou a tela, por exemplo), a publicação **aborta antes de postar**, com erro
+  `ai_label: ...`. Com `=0` ela só avisa no log e posta sem rótulo.
+- Os textos reconhecidos são PT-BR e EN. Se o Facebook da conta estiver em outro idioma, ajuste
+  `AI_CHIP_SELECTORS` / `AI_SWITCH_SELECTORS` / `AI_CONFIRM_SELECTORS`.
+- Status: testado no compositor (liga, confirma, idempotente, falha segura). **Falta confirmar num post
+  real** que o Reel publicado exibe o rótulo.
+
 ## Armadilhas conhecidas
 
 - **Não abra o painel com `http://admin:senha@host/`.** O navegador passa a recusar todo `fetch()`
@@ -96,6 +112,9 @@ python scripts/creatorhub_cli.py cancel 42
   "Guia Inicial" aparece sem tradução. Feche; some depois (fica no `localStorage` do navegador).
   Alguns botões soltos também seguem em chinês (lacuna do overlay PT-BR, não do container).
 - **Erros da API vêm em chinês** (ex.: 409 de idempotência). A CLI imprime em UTF-8, sem quebrar.
+- **Pop-ups do Chrome:** a imagem traz uma política (`deploy/chrome-policy.json`) que bloqueia o pedido de
+  notificações, a barra do Tradutor e o gerenciador de senhas do Chrome, que ficavam por cima do Facebook
+  durante a publicação em Páginas.
 - **Reset total:** `docker compose down -v` apaga o volume (inclui logins). Para só reiniciar, `docker compose restart`.
 
 ## Segurança (o que foi verificado)

@@ -44,6 +44,11 @@ COPY config.example.yaml ./config.example.yaml
 COPY deploy ./deploy
 RUN sed -i 's/\r$//' deploy/* && chmod +x deploy/*.sh
 
+# Politica do Chrome: sem pedido de notificacao/Tradutor/gerenciador de senhas por cima do Facebook
+# (no fluxo de publicacao em Paginas eles atrapalhavam o clique no compositor).
+RUN mkdir -p /etc/opt/chrome/policies/managed \
+    && cp deploy/chrome-policy.json /etc/opt/chrome/policies/managed/creatorhub.json
+
 # Usuario sem privilegio (uid 1000). O entrypoint sobe como root so para
 # acertar a posse do volume (Railway monta volumes como root) e entao rebaixa.
 RUN useradd --uid 1000 --create-home --shell /bin/bash app \
