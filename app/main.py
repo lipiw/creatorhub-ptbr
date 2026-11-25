@@ -20,6 +20,8 @@ def create_app() -> FastAPI:
     application.add_middleware(RequestLoggingMiddleware, cfg_getter=lambda: runtime.cfg)
     register_routes(application)
     application.mount("/static", StaticFiles(directory=str(WEB_DIR)), name="static")
+    from custom.pt_br_plugin import install_pt_br_overlay
+    install_pt_br_overlay(application)
     return application
 
 

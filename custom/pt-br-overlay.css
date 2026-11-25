@@ -1,0 +1,18 @@
+/* Oculta plataformas fora do escopo (mantem apenas: Todas + Facebook, Instagram, TikTok, YouTube) */
+[data-pf="douyin"],
+[data-pf="xhs"],
+[data-pf="rednote"],
+[data-pf="kuaishou"],
+[data-pf="shipinhao"],
+[data-pf="bilibili"],
+[data-pf="twitter"],
+[data-platform="douyin"],
+[data-platform="xhs"],
+[data-platform="rednote"],
+[data-platform="kuaishou"],
+[data-platform="shipinhao"],
+[data-platform="bilibili"],
+[data-platform="twitter"],
+.danmaku-only {
+  display: none !important;
+}
