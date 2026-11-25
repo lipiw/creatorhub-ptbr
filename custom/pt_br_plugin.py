@@ -99,6 +99,34 @@ def _transform_json(obj, allowed: set[str], filter_platforms: bool):
     return obj
 
 
+DIST_DIR = CUSTOM_DIR / "dist"
+DIST_NAMES = {"app.js", "engine-settings.js", "workspace-ui.js", "submissions.js", "appearance.js", "workbench.js"}
+
+
+def ensure_dist() -> None:
+    """Regenera custom/dist quando assets de app/web ou dicionarios forem mais novos."""
+    try:
+        web = CUSTOM_DIR.parent / "app" / "web"
+        srcs = [p for p in web.iterdir() if p.suffix in (".js", ".html")] + [
+            CUSTOM_DIR / "pt-br-dict.json", CUSTOM_DIR / "pt-br-regex.json", CUSTOM_DIR.parent / "scripts" / "build_ptbr.py"]
+        marker = DIST_DIR / "index.html"
+        if marker.exists() and marker.stat().st_mtime >= max(p.stat().st_mtime for p in srcs):
+            return
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("build_ptbr", CUSTOM_DIR.parent / "scripts" / "build_ptbr.py")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        import sys as _sys
+        old = _sys.argv
+        _sys.argv = ["build_ptbr", "--report", "0"]
+        try:
+            mod.main()
+        finally:
+            _sys.argv = old
+    except Exception as exc:  # fallback: overlay de runtime continua funcionando
+        print(f"[pt-br] falha ao gerar dist: {exc}")
+
+
 class PtBrAndPlatformOverlayMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         allowed = set(get_allowed_platforms())
@@ -112,12 +140,21 @@ class PtBrAndPlatformOverlayMiddleware(BaseHTTPMiddleware):
                     content={"detail": f"Plataforma '{q_pf}' desativada nesta versao (permitidas: {', '.join(sorted(allowed))})."},
                 )
 
+        if path.startswith("/static/") and path[8:] in DIST_NAMES and (DIST_DIR / path[8:]).exists():
+            return Response(
+                content=(DIST_DIR / path[8:]).read_bytes(),
+                media_type="application/javascript; charset=utf-8",
+                headers={"Cache-Control": "no-cache"},
+            )
+
         response = await call_next(request)
         content_type = response.headers.get("content-type", "")
 
         if path in ("/", "/index.html") and "text/html" in content_type:
             body_chunks = [chunk async for chunk in response.body_iterator]
             html = b"".join(body_chunks).decode("utf-8", errors="replace")
+            if (DIST_DIR / "index.html").exists():
+                html = (DIST_DIR / "index.html").read_text(encoding="utf-8")
             html = html.replace('<html lang="zh-CN"', '<html lang="pt-BR"', 1)
             inject = (
                 f'\n<script>window.__CREATORHUB_ALLOWED_PLATFORMS__={json.dumps(list(allowed))};</script>'
@@ -163,5 +200,6 @@ class PtBrAndPlatformOverlayMiddleware(BaseHTTPMiddleware):
 
 
 def install_pt_br_overlay(application: FastAPI) -> None:
+    ensure_dist()
     application.add_middleware(PtBrAndPlatformOverlayMiddleware)
     application.mount("/custom", StaticFiles(directory=str(CUSTOM_DIR)), name="custom")
