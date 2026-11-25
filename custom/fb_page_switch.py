@@ -11,6 +11,7 @@ import contextvars
 import functools
 import inspect
 import os
+import re
 
 SWITCH_SELECTORS = (
     'div[role="main"] div[role="button"]:has-text("Trocar agora")',
@@ -89,6 +90,64 @@ async def _first_visible(page, selectors, timeout_ms):
     return None
 
 
+# ── Link do post recem-publicado ────────────────────────────────────────────────────────
+# O upstream/overlay antigo devolvia o PRIMEIRO post do feed apos recarregar a Pagina. Se o Reel
+# novo ainda estava processando, isso devolvia um post ANTIGO (e o primeiro comentario iria para ele).
+# Agora: guarda os posts existentes antes de publicar e so aceita o post cuja legenda bate com a
+# que enviamos, ou que nao existia antes; sem achar, devolve "" (o app usa a URL do perfil).
+LINK_ATTEMPTS = 5  # recargas da Pagina procurando o post novo (~15 s cada)
+
+_ARTICLES_JS = r"""() => [...document.querySelectorAll('div[role="article"]')].map(art => {
+    let href = '';
+    for (const a of art.querySelectorAll('a[href]')) {
+        const h = a.href || '';
+        if (/\/(posts|videos|reel|permalink\.php|photo|story\.php)\/?./i.test(h)) { href = h; break; }
+    }
+    return {href: href, text: (art.innerText || '').replace(/\s+/g, ' ').slice(0, 500)};
+}).filter(x => x.href)"""
+
+
+_RECENT_RE = re.compile(r"(h[aá]\s+\d+\s*(min|seg|s)\b|\bagora\b|just now|\b\d+\s*(min|m)\b)", re.I)
+
+
+def _norm_link(href: str) -> str:
+    return str(href or "").split("?")[0].rstrip("/")
+
+
+def _norm_text(text: str) -> str:
+    return " ".join(str(text or "").split()).lower()
+
+
+def pick_new_link(articles, before, caption) -> str:
+    """Escolhe o link do post novo entre os artigos do feed (em ordem). Funcao pura, testavel.
+
+    Com legenda: so vale o artigo cujo texto contem o inicio da legenda enviada (o snapshot NAO
+    serve de prova, porque o feed carrega aos poucos e ele pode estar incompleto).
+    Sem legenda: primeiro link que nao estava no snapshot E cujo artigo mostra que e recente
+    ("Há 5 min", "Agora", "Just now"...). Sem candidato seguro: ''."""
+    snippet = _norm_text(caption)[:30]
+    if snippet:
+        for art in articles:
+            if snippet in _norm_text(art.get("text")):
+                return str(art.get("href") or "").split("?")[0]
+        return ""
+    if before is not None:  # snapshot vazio e valido (Pagina sem posts); a marca de recencia protege
+        for art in articles:
+            if _norm_link(art.get("href")) not in before and _RECENT_RE.search(str(art.get("text") or "")):
+                return str(art.get("href") or "").split("?")[0]
+    return ""
+
+
+async def _snapshot_links(page, state) -> None:
+    if state.get("before") is not None:
+        return
+    try:
+        arts = await page.evaluate(_ARTICLES_JS)
+        state["before"] = {_norm_link(a["href"]) for a in arts}
+    except Exception:
+        state["before"] = None  # tenta de novo na proxima chamada
+
+
 async def ensure_ai_label(page) -> None:
     """Liga o rotulo de IA no compositor aberto e confirma pelo estado do botao. Levanta RuntimeError se falhar."""
     chip = await _first_visible(page, AI_CHIP_SELECTORS, 5000)
@@ -116,13 +175,20 @@ async def ensure_ai_label(page) -> None:
 
 
 async def maybe_ai_label(page) -> None:
-    """Aplica uma unica vez por publicacao, so se pedido e se o compositor 'Criar post' estiver aberto."""
+    """Com o compositor 'Criar post' aberto: (1) guarda uma vez os posts que a Pagina ja tem (para achar
+    depois o link do post NOVO) e (2) liga o rotulo de IA, uma unica vez por publicacao, se pedido."""
     state = _AI_STATE.get()
-    if not state or not state["want"] or state["done"] or page is None or page.is_closed():
+    if not state or page is None or page.is_closed():
         return
     try:
         if not await page.locator('div[role="dialog"] form').count():
             return
+    except Exception:
+        return
+    await _snapshot_links(page, state)
+    if not state["want"] or state["done"]:
+        return
+    try:
         await ensure_ai_label(page)
         state["done"] = True
         print("[fb-ai-label] rotulo de IA ativado")
@@ -142,7 +208,8 @@ def _wrap_publish(original):
             opts = sig.bind_partial(*args, **kwargs).arguments.get("fb_options")
         except TypeError:
             opts = kwargs.get("fb_options")
-        token = _AI_STATE.set({"want": want_ai_label(opts), "done": False})
+        # before: links dos posts que a Pagina ja tinha ANTES de publicar; caption: legenda do post novo
+        token = _AI_STATE.set({"want": want_ai_label(opts), "done": False, "before": None, "caption": ""})
         try:
             return await original(*args, **kwargs)
         finally:
@@ -166,6 +233,13 @@ class _RobustTyping:
         if page is None:
             return await self._e.type_text(locator, text, page=page, clear=clear, timeout=timeout, **kw)
         await maybe_ai_label(page)  # rotulo de IA antes de digitar a legenda
+        st = _AI_STATE.get()
+        if st is not None and not st.get("caption"):
+            try:
+                if await page.locator('div[role="dialog"] form').count():
+                    st["caption"] = str(text)  # so a legenda do compositor (nao o primeiro comentario)
+            except Exception:
+                pass
         await locator.click(timeout=timeout)
         lines = str(text).replace(chr(13) + chr(10), chr(10)).split(chr(10))
         for i, line in enumerate(lines):
@@ -185,21 +259,24 @@ class _RobustTyping:
 
 
 async def _latest_post_link(page, target_url: str) -> str:
-    """Recarrega a Pagina e le o post/Reel mais recente (o upstream lia a pagina sem recarregar e devolvia um post antigo)."""
+    """Recarrega a Pagina e devolve o link do post/Reel NOVO (nao o primeiro do feed: pode ser um antigo).
+    Tenta algumas vezes porque o Reel recem-publicado demora a aparecer. Sem achar com seguranca: ''."""
+    state = _AI_STATE.get() or {}
+    before, caption = state.get("before"), state.get("caption") or ""
     try:
-        await asyncio.sleep(12)
-        await page.goto(target_url, wait_until="domcontentloaded", timeout=40000)
-        await asyncio.sleep(6)
-        await page.evaluate("window.scrollBy({top: 500, behavior: 'smooth'})")
-        await asyncio.sleep(2)
-        href = await page.evaluate(r"""() => {
-            for (const a of document.querySelectorAll('div[role="article"] a[href]')) {
-                const h = a.href || '';
-                if (/\/(posts|videos|reel|permalink\.php|photo|story\.php)\/?./i.test(h)) return h.split('?')[0];
-            }
-            return '';
-        }""")
-        return str(href or "").strip()
+        for attempt in range(LINK_ATTEMPTS):
+            await asyncio.sleep(12 if attempt == 0 else 8)
+            await page.goto(target_url, wait_until="domcontentloaded", timeout=40000)
+            await asyncio.sleep(6)
+            await page.evaluate("window.scrollBy({top: 500, behavior: 'smooth'})")
+            await asyncio.sleep(2)
+            arts = await page.evaluate(_ARTICLES_JS)
+            # sem snapshot nem legenda nao ha como distinguir o novo: devolve '' (nunca adivinha o 1o do feed)
+            href = pick_new_link(arts, before, caption)
+            if href:
+                return href
+        print("[fb-link] post novo nao localizado no feed; devolvendo a URL do perfil")
+        return ""
     except Exception:
         return ""
 

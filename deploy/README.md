@@ -115,6 +115,10 @@ dizer "Rótulo de IA ativado". Código: `custom/fb_page_switch.py` (overlay; o u
 - **Pop-ups do Chrome:** a imagem traz uma política (`deploy/chrome-policy.json`) que bloqueia o pedido de
   notificações, a barra do Tradutor e o gerenciador de senhas do Chrome, que ficavam por cima do Facebook
   durante a publicação em Páginas.
+- **Link do Reel publicado:** o app procura o post novo recarregando a Página. Antes devolvia o primeiro post do
+  feed, que podia ser um antigo se o Reel ainda estivesse processando (o primeiro comentário iria para ele).
+  Agora ele só aceita o post cuja **legenda** bate com a enviada (sem legenda: um post inédito e recente) e tenta
+  até 5 vezes; se não achar com segurança, o resultado é a URL do perfil e o primeiro comentário é pulado.
 - **Reset total:** `docker compose down -v` apaga o volume (inclui logins). Para só reiniciar, `docker compose restart`.
 
 ## Segurança (o que foi verificado)
