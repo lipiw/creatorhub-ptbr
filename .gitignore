@@ -56,3 +56,6 @@ _ref/
 
 # 本地临时缓存目录
 pytest-of-*/
+
+# Deploy
+.env

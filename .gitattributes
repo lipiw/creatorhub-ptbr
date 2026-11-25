@@ -1,3 +1,8 @@
 *.bat text eol=crlf
 *.cmd text eol=crlf
 *.sh text eol=lf
+
+# Scripts de container precisam de LF (CRLF quebra o sh no Linux)
+deploy/* text eol=lf
+Dockerfile text eol=lf
+scripts/creatorhub_cli.py text eol=lf

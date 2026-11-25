@@ -1,0 +1,48 @@
+{
+	admin off
+	auto_https off
+}
+
+:{$PORT:8080} {
+	# route{} executa na ORDEM ESCRITA (sem reordenar diretivas): senha -> guarda -> roteamento.
+	route {
+		basic_auth {
+			{$CH_USER} {$CH_PASSWORD_HASH}
+		}
+
+		# Defesa CSRF / WebSocket hijacking. O painel original recusa requisicoes
+		# cross-origin, mas como removemos o Origin mais abaixo, a checagem passa a ser
+		# feita AQUI, antes disso:
+		# - Origin que nao seja o proprio host -> 403
+		# - Sec-Fetch-Site cross-site/same-site em requisicao que nao seja navegacao -> 403
+		# (navegacao normal, ex.: abrir o link do painel pelo celular, continua livre)
+		@cross expression ({header.Sec-Fetch-Mode} != 'navigate' && {header.Sec-Fetch-Site} in ['cross-site', 'same-site']) || ({header.Origin} != '' && !{header.Origin}.endsWith('://' + {hostport}))
+		respond @cross "Origem nao permitida" 403
+
+		# A tela do navegador (noVNC). /vnc abre ja conectado.
+		redir /vnc /novnc/vnc.html?autoconnect=1&resize=scale&path=novnc/websockify 302
+		handle_path /novnc/* {
+			reverse_proxy 127.0.0.1:6080
+		}
+
+		# Comprime JS/HTML do painel (celular); nunca a API (tem SSE).
+		@compress not path /api/*
+		encode @compress zstd gzip
+
+		# O painel so aceita peer E Host loopback e same-origin. Aqui o Caddy fala
+		# com ele por 127.0.0.1, com Host de loopback, e remove os cabecalhos que
+		# denunciam a origem real (a validacao de origem ja foi feita acima).
+		handle {
+			reverse_proxy 127.0.0.1:8000 {
+				header_up Host 127.0.0.1:8000
+				header_up -Origin
+				header_up -Referer
+				header_up -Sec-Fetch-Site
+				header_up -X-Forwarded-For
+				header_up -X-Forwarded-Host
+				header_up -X-Forwarded-Proto
+				flush_interval -1
+			}
+		}
+	}
+}

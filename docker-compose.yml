@@ -1,0 +1,22 @@
+# Uso local:  copie .env.example para .env, defina CH_PASSWORD e rode:
+#   docker compose up -d --build
+# Painel:  http://localhost:8080   |   Tela do navegador (noVNC): http://localhost:8080/vnc
+services:
+  creatorhub:
+    build: .
+    image: creatorhub-ptbr:local
+    container_name: creatorhub
+    hostname: creatorhub          # fixo: evita o Chrome achar que o perfil esta "em outra maquina"
+    restart: unless-stopped
+    shm_size: 1gb                 # Chrome headed trava com o /dev/shm padrao de 64MB
+    ports:
+      - "${HOST_BIND:-127.0.0.1}:${HOST_PORT:-8080}:8080"   # padrao: so este PC. Celular: tunel/VPN ou HOST_BIND=0.0.0.0 (ver deploy/README.md)
+    environment:
+      CH_USER: ${CH_USER:-admin}
+      CH_PASSWORD: ${CH_PASSWORD:?defina CH_PASSWORD no arquivo .env}
+      TZ: ${TZ:-America/Sao_Paulo}
+    volumes:
+      - creatorhub-data:/app/data
+
+volumes:
+  creatorhub-data:

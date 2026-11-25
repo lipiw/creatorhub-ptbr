@@ -1,0 +1,102 @@
+# CreatorHub em container (segundo plano, sem abrir nada na sua tela)
+
+O Chrome roda **com janela** dentro de uma tela virtual (Xvfb) no container. Você
+acompanha pelo painel ou pela tela do navegador (noVNC), do PC ou do celular.
+
+```
+você / agentes ──► Caddy :8080 (senha) ─┬─► painel CreatorHub  (127.0.0.1:8000, só interno)
+                                        └─► /vnc  noVNC ─► Xvfb :99 ◄── Chrome (Patchright)
+```
+
+## Subir (local)
+
+```powershell
+copy .env.example .env      # edite: CH_PASSWORD (mín. 12 caracteres)
+docker compose up -d --build
+```
+
+- Painel: <http://localhost:8080> (usuário `admin`, senha = `CH_PASSWORD`)
+- Tela do navegador: <http://localhost:8080/vnc>
+- Logs: `docker compose logs -f`
+- Parar / iniciar: `docker compose stop` / `docker compose start`
+
+Tudo persistente (banco, perfis do Chrome com as sessões, vídeos, config) fica no
+volume `creatorhub-data` (`/app/data`). `docker compose down` **mantém** o volume;
+`docker compose down -v` **apaga tudo, inclusive os logins**.
+
+## Primeiro login das contas
+
+As sessões antigas do Windows **não migram**: o Chrome cifra os cookies com a conta
+do Windows (DPAPI). Faça o login de novo dentro do container:
+
+1. Abra o painel, escolha a conta/plataforma e inicie o login.
+2. Abra `/vnc` em outra aba: a janela do Chrome aparece ali; faça login (2FA etc.) normalmente.
+3. Pronto — a sessão fica no volume e sobrevive a restart e rebuild.
+
+Faça isso **com o proxy da conta já configurado**, na mesma saída de rede em que ela
+vai publicar (login em um IP e publicação em outro é o que dispara checkpoint).
+
+## Celular
+
+O compose publica só em `127.0.0.1`. Duas formas seguras de chegar do celular:
+
+- **Tailscale** (recomendado): instale no PC e no celular e abra `http://<ip-tailscale-do-pc>:8080`
+  com `HOST_BIND=<ip-tailscale-do-pc>` no `.env`.
+- **Cloudflare Tunnel**: `cloudflared tunnel --url http://localhost:8080`. A URL fica pública,
+  então a senha precisa ser longa e única.
+- Mesma rede Wi-Fi: `HOST_BIND=0.0.0.0` (qualquer um na rede chega no login; use senha forte).
+
+> O painel **não tem login próprio**. Toda a proteção é a senha do Caddy. Nunca exponha
+> a porta sem ela (o entrypoint recusa subir sem `CH_PASSWORD`).
+
+## Agentes (Claude Code, Antigravity, scripts)
+
+Use a CLI `scripts/creatorhub_cli.py` (só biblioteca padrão; toda saída é JSON):
+
+```powershell
+$env:CREATORHUB_URL="http://localhost:8080"; $env:CREATORHUB_PASSWORD="<CH_PASSWORD>"
+python scripts/creatorhub_cli.py accounts --platform facebook
+python scripts/creatorhub_cli.py schedule --account 3 --video C:\videos\reel.mp4 `
+    --at 2026-12-01T19:30:00-03:00 --title "Titulo" --desc "Legenda" --topics "#dica" `
+    --fb-page-id 123456789
+python scripts/creatorhub_cli.py list --status pending
+python scripts/creatorhub_cli.py run-now 42
+python scripts/creatorhub_cli.py cancel 42
+```
+
+- Repetir o **mesmo** comando não duplica (a `Idempotency-Key` é derivada do conteúdo);
+  use `--new` para criar outra tarefa idêntica de propósito.
+- Sem fuso em `--at`, vale o fuso da conta; sem `--at`, publica o quanto antes.
+- A API REST é a mesma que o painel usa (`/api/accounts`, `/api/publish`, ...), então
+  qualquer agente com `curl -u admin:SENHA` também consegue.
+
+## Armadilhas conhecidas
+
+- **Não abra o painel com `http://admin:senha@host/`.** O navegador passa a recusar todo `fetch()`
+  ("URL que inclui credenciais") e o painel mostra "falha ao atualizar dados". Abra a URL limpa e
+  digite usuário/senha na caixa que o navegador mostra.
+- **Faixa "--no-sandbox" no Chrome:** o Patchright liga essa flag no Linux, então aparece o aviso
+  "unsupported command-line flag" no topo da janela (é só visual; feche no X).
+- **Diálogo de primeiros passos em chinês:** na primeira abertura num navegador novo, o assistente
+  "Guia Inicial" aparece sem tradução. Feche; some depois (fica no `localStorage` do navegador).
+  Alguns botões soltos também seguem em chinês (lacuna do overlay PT-BR, não do container).
+- **Erros da API vêm em chinês** (ex.: 409 de idempotência). A CLI imprime em UTF-8, sem quebrar.
+- **Reset total:** `docker compose down -v` apaga o volume (inclui logins). Para só reiniciar, `docker compose restart`.
+
+## Segurança (o que foi verificado)
+
+- Sem senha ou com senha errada: `401` em tudo (painel, API, noVNC).
+- O painel (8000) e o VNC (5900) **não** são publicados no host; só o Caddy (8080).
+- Requisição de **outra origem** (`Origin` diferente ou `Sec-Fetch-Site: cross-site`) e WebSocket do
+  noVNC de outro site: `403`. Isso substitui a defesa CSRF do painel, que o Caddy precisa desligar
+  para ele aceitar acesso remoto. Abrir um link do painel vindo de outro app continua funcionando.
+- O app e o Chrome rodam como `app` (uid 1000), não como root.
+
+## Observações
+
+- **Imagem só amd64** (o Google Chrome não tem build Linux arm64).
+- O Chrome roda como usuário `app` (uid 1000) e não como root.
+- Publicação em **Xiaohongshu** assina requisições com Node.js, que não está na imagem
+  (fora das suas 4 redes). Se precisar, adicione `nodejs` ao `apt-get` do Dockerfile.
+- **Railway** (depois): a mesma imagem sobe lá; defina `CH_PASSWORD`, monte um volume em
+  `/app/data` e configure **proxy residencial por conta** — o IP do datacenter é o risco.
