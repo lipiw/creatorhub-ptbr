@@ -24,17 +24,32 @@ Tudo persistente (banco, perfis do Chrome com as sessões, vídeos, config) fica
 volume `creatorhub-data` (`/app/data`). `docker compose down` **mantém** o volume;
 `docker compose down -v` **apaga tudo, inclusive os logins**.
 
-## Primeiro login das contas
+## Contas: trazer a que já está logada (ou logar de novo)
 
-As sessões antigas do Windows **não migram**: o Chrome cifra os cookies com a conta
-do Windows (DPAPI). Faça o login de novo dentro do container:
+**Trazer do Windows (recomendado, já testado):** o login fica no banco (`storage_state`, JSON), e o app
+injeta isso sozinho quando abre o Chrome com perfil vazio. O que **não** migra é a pasta do perfil do
+Chrome (cookies cifrados com a conta do Windows) — mas ela não é necessária.
 
-1. Abra o painel, escolha a conta/plataforma e inicie o login.
-2. Abra `/vnc` em outra aba: a janela do Chrome aparece ali; faça login (2FA etc.) normalmente.
-3. Pronto — a sessão fica no volume e sobrevive a restart e rebuild.
+```powershell
+python scripts/migrate_account_to_container.py --list                    # contas locais
+python scripts/migrate_account_to_container.py --account-id 1 --dry-run  # resumo, sem copiar
+python scripts/migrate_account_to_container.py --account-id 1            # copia só essa conta
+```
 
-Faça isso **com o proxy da conta já configurado**, na mesma saída de rede em que ela
-vai publicar (login em um IP e publicação em outro é o que dispara checkpoint).
+Depois confirme: `POST /api/accounts/<id>/keepalive` e/ou `open-browser` e veja em `/vnc`.
+Antes de copiar, **pare o CreatorHub local** (mesma sessão nos dois lugares ao mesmo tempo confunde a
+plataforma) e use a mesma saída de rede de antes (com Docker no seu PC, é o mesmo IP).
+
+> Risco: o Chrome do container é Linux; a sessão nasceu num Chrome Windows. O Facebook costuma aceitar
+> (o cookie `datr` do aparelho vai junto), mas pode pedir confirmação. Se pedir, faça o login pelo `/vnc`.
+
+**Logar de novo no container** (contas novas ou se a plataforma recusar a sessão): inicie o login pelo
+painel, abra `/vnc` em outra aba e faça o login (2FA etc.) na janela do Chrome. A sessão fica no volume.
+Faça isso **com o proxy da conta já configurado**: login num IP e publicação em outro dispara checkpoint.
+
+**Páginas do Facebook:** a lista de Páginas salvas do formulário fica no `localStorage` do navegador
+(não no servidor), então começa vazia em cada origem nova (ex.: `localhost:8080`). Os IDs reais vêm de
+`POST /api/facebook/pages {"account_id": 1}`; na CLI use `--fb-page-id <ID>` direto.
 
 ## Celular
 

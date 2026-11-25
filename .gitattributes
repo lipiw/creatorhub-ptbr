@@ -6,3 +6,4 @@
 deploy/* text eol=lf
 Dockerfile text eol=lf
 scripts/creatorhub_cli.py text eol=lf
+scripts/migrate_account_to_container.py text eol=lf
