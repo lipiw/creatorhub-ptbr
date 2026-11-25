@@ -202,5 +202,10 @@ class PtBrAndPlatformOverlayMiddleware(BaseHTTPMiddleware):
 
 def install_pt_br_overlay(application: FastAPI) -> None:
     ensure_dist()
+    try:
+        from custom import fb_page_switch
+        fb_page_switch.install()
+    except Exception as exc:
+        print(f"[pt-br] fb_page_switch indisponivel: {exc!r}")
     application.add_middleware(PtBrAndPlatformOverlayMiddleware)
     application.mount("/custom", StaticFiles(directory=str(CUSTOM_DIR)), name="custom")
