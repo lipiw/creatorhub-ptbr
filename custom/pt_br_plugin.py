@@ -133,7 +133,20 @@ class PtBrAndPlatformOverlayMiddleware(BaseHTTPMiddleware):
             return Response(content=html.encode("utf-8"), status_code=response.status_code, headers=headers, media_type="text/html")
 
         if path.startswith("/api/") and "application/json" in content_type:
-            filter_pf = any(seg in path for seg in ("/matrix", "/overview", "/platforms", "/health", "/summary", "/accounts"))
+            filter_pf = any(
+                seg in path
+                for seg in (
+                    "/matrix",
+                    "/overview",
+                    "/platforms",
+                    "/health",
+                    "/summary",
+                    "/accounts",
+                    "/diagnostics",
+                    "/transport",
+                    "/engine-settings",
+                )
+            )
             body_chunks = [chunk async for chunk in response.body_iterator]
             raw = b"".join(body_chunks)
             try:

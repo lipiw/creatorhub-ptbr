@@ -13,6 +13,8 @@
 [data-platform="shipinhao"],
 [data-platform="bilibili"],
 [data-platform="twitter"],
+[data-section="channels"],
+#channels-protocol-card,
 .danmaku-only {
   display: none !important;
 }

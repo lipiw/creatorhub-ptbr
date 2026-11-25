@@ -1,5 +1,93 @@
 [
   [
+    "^1\\.\\s*选择分发目标账号（已选\\s*(.+?)\\s*个账号，跨\\s*(.+?)\\s*个平台）$",
+    "1. Selecionar contas de destino ($1 conta(s), em $2 rede(s))"
+  ],
+  [
+    "^查看全部精简运行记录\\s*\\(\\s*(\\d+)\\s*条\\s*\\)$",
+    "Ver todos os registros resumidos ($1 itens)"
+  ],
+  [
+    "^(\\d+)\\s*个文件$",
+    "$1 arquivo(s)"
+  ],
+  [
+    "^巡检[:：]\\s*每\\s*(\\d+)\\s*分钟$",
+    "Checagem: a cada $1 min"
+  ],
+  [
+    "^巡检[:：]\\s*每\\s*(\\d+)\\s*秒$",
+    "Checagem: a cada $1 s"
+  ],
+  [
+    "^复用共享渠道「(.+?)」\\s*[·•]\\s*(.+?)\\s*[·•]\\s*未选模型$",
+    "Reutilizando canal compartilhado \"$1\" · $2 · Sem modelo selecionado"
+  ],
+  [
+    "^复用共享渠道「(.+?)」\\s*[·•]\\s*(.+?)\\s*[·•]\\s*(.+?)$",
+    "Reutilizando canal compartilhado \"$1\" · $2 · $3"
+  ],
+  [
+    "^Seguir canal atual do Assistente de IA\\s*[·•]\\s*默认渠道（未配模型）$",
+    "Seguir canal atual do Assistente IA · Canal Padrão (sem modelo)"
+  ],
+  [
+    "^跟随 AI 助手当前渠道\\s*[·•]\\s*(.+?)（未配模型）$",
+    "Seguir canal atual do Assistente IA · $1 (sem modelo)"
+  ],
+  [
+    "^跟随 AI 助手当前渠道\\s*[·•]\\s*(.+?)$",
+    "Seguir canal atual do Assistente IA · $1"
+  ],
+  [
+    "^共享写间隔\\s*(\\d+)分\\s*[·•]\\s*评论\\s*(\\d+)分/(\\d+)次/时/(\\d+)次/日\\s*[·•]\\s*发布\\s*(\\d+)分/(\\d+)次/日$",
+    "Intervalo escrita $1 min · Comentários $2 min / $3/h / $4/dia · Publicar $5 min / $6/dia"
+  ],
+  [
+    "^轻/重读\\s*(\\d+)/(\\d+)秒\\s*[·•]\\s*跨功能\\s*(.+?)秒\\s*[·•]\\s*连续\\s*(\\d+)次休\\s*(.+?)秒$",
+    "Leitura leve/pesada $1/$2 s · Entre ações $3 s · Pausa após $4 ações: $5 s"
+  ],
+  [
+    "^活跃\\s*(.+?)\\s*[·•]\\s*仅限制自动写操作$",
+    "Ativo $1 · Limita apenas escritas automáticas"
+  ],
+  [
+    "^活跃\\s*(.+?)\\s*[·•]\\s*含定时读取$",
+    "Ativo $1 · Inclui leituras agendadas"
+  ],
+  [
+    "^同出口并发\\s*(\\d+)\\s*[·•]\\s*(\\d+)分内\\s*(\\d+)号命中熔断\\s*(\\d+)分$",
+    "Concorrência mesmo IP: $1 · $3 contas em $2 min bloqueiam por $4 min"
+  ],
+  [
+    "^跟随全局\\s*\\(\\s*本地 Patchright / 系统 Chrome\\s*\\)$",
+    "Seguir global (Patchright local / Chrome do sistema)"
+  ],
+  [
+    "^Seguir global\\s*\\(\\s*本地 Patchright / 系统 Chrome\\s*\\)$",
+    "Seguir global (Patchright local / Chrome do sistema)"
+  ],
+  [
+    "^今日新增评论\\s*(.+?)\\s*(?:条|itens)$",
+    "Novos comentários hoje: $1"
+  ],
+  [
+    "^今日新抓\\s*(.+?)\\s*条\\s*[·•]\\s*运行监控\\s*(.+?)$",
+    "Coletados hoje: $1 · Monitores ativos: $2"
+  ],
+  [
+    "^一键入队分发\\s*\\(\\s*(\\d+)\\s*个账号\\s*\\)$",
+    "Enfileirar publicação ($1 conta(s))"
+  ],
+  [
+    "^标题\\s*(\\d+)\\s*/\\s*(\\d+)$",
+    "Título $1 / $2"
+  ],
+  [
+    "^可选[:：]单独覆盖(.+?)标题（留空沿用主标题）$",
+    "Opcional: sobrescrever título do $1 (vazio = usa o título principal)"
+  ],
+  [
     "^每\\s*(\\d+)\\s*秒$",
     "A cada $1 s"
   ],
@@ -78,10 +166,6 @@
   [
     "^自有已发作品\\s*(.+?)\\s*篇$",
     "Posts próprios publicados: $1"
-  ],
-  [
-    "^今日新抓\\s*(.+?)\\s*条\\s*[·•]\\s*运行监控\\s*(.+?)$",
-    "Coletados hoje: $1 · Monitores ativos: $2"
   ],
   [
     "^今日新增评论\\s*(.+?)\\s*条$",

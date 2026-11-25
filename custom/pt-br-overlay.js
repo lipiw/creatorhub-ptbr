@@ -1,7 +1,19 @@
-/* CreatorHub Overlay PT-BR (Frases Completas + Regex + Mascaramento Inline + Filtro 4 Redes) */
+/* CreatorHub Overlay PT-BR (Frases Completas + React TextNode Merge + Regex + Filtro 4 Redes) */
 (function () {
   const HIDDEN_PFS = new Set(["douyin", "xhs", "rednote", "kuaishou", "shipinhao", "bilibili", "twitter"]);
-  const HIDDEN_LABELS = ["抖音", "小红书", "海外小红书", "快手", "视频号", "哔哩哔哩", "Twitter", "B站", "Rednote"];
+  const HIDDEN_LABELS = ["抖音", "小红书", "海外小红书", "快手", "视频号", "哔哩哔哩", "Twitter", "B站", "Rednote", "视频号微信通道"];
+  const HIDDEN_FIELD_PREFIXES = [
+    "eng-backfill-mode",
+    "engine-danmaku_",
+    "engine-xhs_",
+    "engine-douyin_",
+    "engine-bilibili_",
+    "engine-shipinhao_",
+    "engine-channels_",
+    "engine-rednote_",
+    "engine-kuaishou_",
+    "engine-twitter_",
+  ];
   const CJK_RE = /[\u4e00-\u9fff]/;
   const INLINE_OK = new Set(["SPAN", "B", "STRONG", "EM", "SMALL", "KBD", "I"]);
 
@@ -37,6 +49,7 @@
   function pruneHiddenPlatforms(root) {
     if (!root || !root.querySelectorAll) return;
 
+    // 1. Opcoes de <select>
     root.querySelectorAll("option").forEach((opt) => {
       const v = (opt.value || "").toLowerCase();
       if (HIDDEN_PFS.has(v)) {
@@ -46,26 +59,70 @@
       }
     });
 
-    root.querySelectorAll("[data-pf], [data-platform]").forEach((el) => {
+    // 2. Elementos com data-pf / data-platform / data-section="channels"
+    root.querySelectorAll("[data-pf], [data-platform], [data-section='channels'], [data-target-section='channels']").forEach((el) => {
       const pf = (el.getAttribute("data-pf") || el.getAttribute("data-platform") || "").toLowerCase();
-      if (HIDDEN_PFS.has(pf)) {
+      const sec = (el.getAttribute("data-section") || el.getAttribute("data-target-section") || "").toLowerCase();
+      if (HIDDEN_PFS.has(pf) || sec === "channels") {
         el.style.display = "none";
       }
     });
 
-    root.querySelectorAll("button, [role='tab'], .pf-card, .platform-card, .chip").forEach((el) => {
+    // 3. Abas/botoes/cards das redes ocultas (inclui aba 视频号微信通道 em Configuracoes)
+    root.querySelectorAll("button, [role='tab'], .pf-card, .platform-card, .chip, .eng-pf-card").forEach((el) => {
       if (el.closest(".pswitch")) return;
       const txt = (el.textContent || "").trim();
-      if (HIDDEN_LABELS.some((lbl) => txt === lbl || txt.startsWith(lbl + " ") || txt.startsWith(lbl + "("))) {
+      if (HIDDEN_LABELS.some((lbl) => txt === lbl || txt.startsWith(lbl + " ") || txt.startsWith(lbl + "(") || txt.startsWith(lbl + "\n"))) {
         el.style.display = "none";
+      }
+      const badge = el.querySelector && el.querySelector("[data-pf-badge]");
+      if (badge && HIDDEN_PFS.has((badge.getAttribute("data-pf-badge") || "").toLowerCase())) {
+        el.style.display = "none";
+      }
+    });
+
+    // 4. Linhas da tabela de Diagnostico tecnico de redes desativadas
+    root.querySelectorAll("tr").forEach((tr) => {
+      const firstCell = tr.querySelector("td");
+      if (!firstCell) return;
+      const cellTxt = (firstCell.textContent || "").trim();
+      if (HIDDEN_LABELS.includes(cellTxt)) {
+        tr.style.display = "none";
+      }
+    });
+
+    // 5. Campos de configuracao exclusivos das redes chinesas (Douyin/XHS/B站/Danmaku/WeChat)
+    root.querySelectorAll("input[id], select[id]").forEach((inp) => {
+      const id = inp.id || "";
+      if (HIDDEN_FIELD_PREFIXES.some((p) => id.startsWith(p))) {
+        const container = inp.closest(".form-field, .switch-row, label.switch-item, .field-group");
+        if (container) container.style.display = "none";
       }
     });
   }
 
-  // Tenta traduzir container com filhos inline simples (ex: "自有已发作品 <b>0</b> 篇") preservando os nos filhos
+  // Trata elementos com multiplos TextNodes adjacentes gerados pelo React (ex: <span>跨 {0} 个已接入平台</span>)
+  function tryTranslateSplitTextNodes(el) {
+    if (!el || el.nodeType !== Node.ELEMENT_NODE) return false;
+    if (el.children.length !== 0 || el.childNodes.length <= 1) return false;
+    const combined = el.textContent || "";
+    if (!CJK_RE.test(combined)) return false;
+    const translated = translateText(combined);
+    if (translated === combined) return false;
+    isMutatingDom = true;
+    try {
+      el.textContent = translated;
+    } finally {
+      isMutatingDom = false;
+    }
+    return true;
+  }
+
+  // Trata containers com filhos inline simples (ex: "自有已发作品 <b>0</b> 篇") preservando os nos filhos
   function tryTranslateInlineContainer(el) {
     if (!el || el.nodeType !== Node.ELEMENT_NODE) return false;
-    if (el.children.length === 0 || el.children.length > 4) return false;
+    if (el.children.length === 0) return tryTranslateSplitTextNodes(el);
+    if (el.children.length > 4) return false;
     if (!CJK_RE.test(el.textContent || "")) return false;
     for (const ch of el.children) {
       if (!INLINE_OK.has(ch.tagName) || ch.children.length > 1) return false;
@@ -134,10 +191,10 @@
     if (tag === "SCRIPT" || tag === "STYLE" || tag === "CODE" || tag === "PRE") return;
 
     translateAttrs(root);
-    root.querySelectorAll("[placeholder], [title], [aria-label], [data-tooltip], [data-title], input, button").forEach(translateAttrs);
+    root.querySelectorAll("[placeholder], [title], [aria-label], [data-tooltip], [data-title], input, button, textarea").forEach(translateAttrs);
 
-    // 1a passagem: containers mistos com <b> / <span> de numeros
-    root.querySelectorAll("div, span, p, small, label, h1, h2, h3, h4, li, td, th").forEach((el) => {
+    // 1a passagem: containers com TextNodes divididos (React) ou filhos inline
+    root.querySelectorAll("div, span, p, small, label, b, strong, h1, h2, h3, h4, li, td, th, summary, button, option").forEach((el) => {
       tryTranslateInlineContainer(el);
     });
 
@@ -165,6 +222,17 @@
       const badge = document.getElementById("page-platform");
       if (badge && HIDDEN_LABELS.includes((badge.textContent || "").trim())) {
         if (typeof window.switchPlatform === "function") window.switchPlatform("facebook");
+      }
+      // Garante que modais de login nunca caiam em "douyin" quando a tela esta em "all"
+      for (const fnName of ["preparePreLoginEnvironment", "startQrLogin", "openQrLogin"]) {
+        if (typeof window[fnName] === "function" && !window[fnName].__pfGuarded) {
+          const orig = window[fnName];
+          window[fnName] = function (pf, ...rest) {
+            const targetPf = !pf || pf === "all" || HIDDEN_PFS.has(String(pf).toLowerCase()) ? "facebook" : pf;
+            return orig.call(this, targetPf, ...rest);
+          };
+          window[fnName].__pfGuarded = true;
+        }
       }
     } catch (_) {}
   }
@@ -224,9 +292,11 @@
     translateNodeTree(document.body);
     ensureAllowedDefaultPlatform();
     setTimeout(() => {
+      pruneHiddenPlatforms(document.body);
+      translateNodeTree(document.body);
       ensureAllowedDefaultPlatform();
       auditRemainingCjk();
-    }, 500);
+    }, 600);
 
     const observer = new MutationObserver((mutations) => {
       if (isMutatingDom) return;
@@ -241,6 +311,9 @@
             if (n.nodeType === Node.ELEMENT_NODE) pruneHiddenPlatforms(n);
             translateNodeTree(n);
           });
+          if (m.target && m.target.nodeType === Node.ELEMENT_NODE) {
+            tryTranslateInlineContainer(m.target);
+          }
         }
       }
     });
