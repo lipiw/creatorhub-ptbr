@@ -59,17 +59,13 @@ EXACT_MAP, PHRASE_LIST, REGEX_LIST = _load_i18n()
 def _translate_str(s: str) -> str:
     if not s or not CJK_RE.search(s):
         return s
-    st = s.strip()
+    st = re.sub(r"\s+", " ", s).strip()
     if st in EXACT_MAP:
-        return s.replace(st, EXACT_MAP[st])
+        return s.replace(s.strip(), EXACT_MAP[st])
     for pat, tpl in REGEX_LIST:
         if pat.search(st):
-            return s.replace(st, pat.sub(tpl, st))
-    out = s
-    for src, dst in PHRASE_LIST:
-        if src in out:
-            out = out.replace(src, dst)
-    return out
+            return s.replace(s.strip(), pat.sub(tpl, st))
+    return s
 
 
 def get_allowed_platforms() -> tuple[str, ...]:

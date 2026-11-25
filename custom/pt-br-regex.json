@@ -1,31 +1,1778 @@
 [
-  ["^每\\s*(\\d+)\\s*秒$", "A cada $1 s"],
-  ["^每\\s*(\\d+)\\s*分钟$", "A cada $1 min"],
-  ["^每\\s*(\\d+)\\s*小时$", "A cada $1 h"],
-  ["^每页\\s*(\\d+)\\s*条$", "$1 por página"],
-  ["^最近\\s*(\\d+)\\s*天$", "Últimos $1 dias"],
-  ["^近\\s*(\\d+)\\s*天采集$", "Coletado nos últimos $1 dias"],
-  ["^最近\\s*(\\d+)\\s*个作品$", "Últimos $1 posts"],
-  ["^已选\\s*(\\d+)\\s*项$", "$1 selecionado(s)"],
-  ["^共\\s*(\\d+)\\s*条$", "Total: $1"],
-  ["^共\\s*(\\d+)\\s*页$", "Total: $1 pág."],
-  ["^第\\s*(\\d+)\\s*页$", "Página $1"],
-  ["^(\\d+)\\s*个节点$", "$1 nó(s)"],
-  ["^(\\d+)\\s*个账号$", "$1 conta(s)"],
-  ["^(\\d+)\\s*条记录$", "$1 registro(s)"],
-  ["^(\\d+)\\s*条评论$", "$1 comentário(s)"],
-  ["^(\\d+)\\s*条私信$", "$1 mensagem(ns)"],
-  ["^(\\d+)\\s*个任务$", "$1 tarefa(s)"],
-  ["^启动失败[:：]\\s*(.*)$", "Falha ao iniciar: $1"],
-  ["^删除失败[:：]\\s*(.*)$", "Falha ao excluir: $1"],
-  ["^批量删除失败[:：]\\s*(.*)$", "Falha na exclusão em lote: $1"],
-  ["^保存失败[:：]\\s*(.*)$", "Falha ao salvar: $1"],
-  ["^操作失败[:：]\\s*(.*)$", "Falha na operação: $1"],
-  ["^同步失败[:：]\\s*(.*)$", "Falha ao sincronizar: $1"],
-  ["^抓取失败[:：]\\s*(.*)$", "Falha na captura: $1"],
-  ["^发送失败[:：]\\s*(.*)$", "Falha ao enviar: $1"],
-  ["^添加失败[:：]\\s*(.*)$", "Falha ao adicionar: $1"],
-  ["^测试失败[:：]\\s*(.*)$", "Falha no teste: $1"],
-  ["^创作者登录启动失败[:：]\\s*(.*)$", "Falha ao iniciar login de criador: $1"],
-  ["^失败[:：]\\s*(.*)$", "Erro: $1"]
+  [
+    "^每\\s*(\\d+)\\s*秒$",
+    "A cada $1 s"
+  ],
+  [
+    "^每\\s*(\\d+)\\s*分钟$",
+    "A cada $1 min"
+  ],
+  [
+    "^每\\s*(\\d+)\\s*小时$",
+    "A cada $1 h"
+  ],
+  [
+    "^每页\\s*(\\d+)\\s*条$",
+    "$1 por página"
+  ],
+  [
+    "^最近\\s*(\\d+)\\s*天$",
+    "Últimos $1 dias"
+  ],
+  [
+    "^近\\s*(\\d+)\\s*天采集$",
+    "Coletado nos últimos $1 dias"
+  ],
+  [
+    "^近\\s*(\\d+)\\s*日跨平台产出趋势$",
+    "Tendência de produção dos últimos $1 dias"
+  ],
+  [
+    "^最近\\s*(\\d+)\\s*个作品$",
+    "Últimos $1 posts"
+  ],
+  [
+    "^已选\\s*(\\d+)\\s*项$",
+    "$1 selecionado(s)"
+  ],
+  [
+    "^共\\s*(\\d+)\\s*条$",
+    "Total: $1"
+  ],
+  [
+    "^共\\s*(\\d+)\\s*页$",
+    "Total: $1 pág."
+  ],
+  [
+    "^第\\s*(\\d+)\\s*页$",
+    "Página $1"
+  ],
+  [
+    "^(\\d+)\\s*个节点$",
+    "$1 nó(s)"
+  ],
+  [
+    "^(\\d+)\\s*个账号$",
+    "$1 conta(s)"
+  ],
+  [
+    "^(\\d+)\\s*条记录$",
+    "$1 registro(s)"
+  ],
+  [
+    "^(\\d+)\\s*条评论$",
+    "$1 comentário(s)"
+  ],
+  [
+    "^(\\d+)\\s*条私信$",
+    "$1 mensagem(ns)"
+  ],
+  [
+    "^(\\d+)\\s*个任务$",
+    "$1 tarefa(s)"
+  ],
+  [
+    "^跨\\s*(.+?)\\s*个已接入平台$",
+    "Em $1 rede(s) conectada(s)"
+  ],
+  [
+    "^自有已发作品\\s*(.+?)\\s*篇$",
+    "Posts próprios publicados: $1"
+  ],
+  [
+    "^今日新抓\\s*(.+?)\\s*条\\s*[·•]\\s*运行监控\\s*(.+?)$",
+    "Coletados hoje: $1 · Monitores ativos: $2"
+  ],
+  [
+    "^今日新增评论\\s*(.+?)\\s*条$",
+    "Novos comentários hoje: $1"
+  ],
+  [
+    "^本地\\s*(.+?)$",
+    "Local: $1"
+  ],
+  [
+    "^队列\\s*(.+?)$",
+    "Fila: $1"
+  ],
+  [
+    "^(\\d+\\s*/\\s*\\d+)\\s*在线$",
+    "$1 online"
+  ],
+  [
+    "^跨\\s*11\\s*大平台全局视角$",
+    "Visão global das redes conectadas"
+  ],
+  [
+    "^跨\\s*(\\d+)\\s*大平台全局视角$",
+    "Visão global das $1 redes"
+  ],
+  [
+    "^启动失败[:：]\\s*(.*)$",
+    "Falha ao iniciar: $1"
+  ],
+  [
+    "^删除失败[:：]\\s*(.*)$",
+    "Falha ao excluir: $1"
+  ],
+  [
+    "^批量删除失败[:：]\\s*(.*)$",
+    "Falha na exclusão em lote: $1"
+  ],
+  [
+    "^保存失败[:：]\\s*(.*)$",
+    "Falha ao salvar: $1"
+  ],
+  [
+    "^操作失败[:：]\\s*(.*)$",
+    "Falha na operação: $1"
+  ],
+  [
+    "^同步失败[:：]\\s*(.*)$",
+    "Falha ao sincronizar: $1"
+  ],
+  [
+    "^抓取失败[:：]\\s*(.*)$",
+    "Falha na captura: $1"
+  ],
+  [
+    "^发送失败[:：]\\s*(.*)$",
+    "Falha ao enviar: $1"
+  ],
+  [
+    "^添加失败[:：]\\s*(.*)$",
+    "Falha ao adicionar: $1"
+  ],
+  [
+    "^测试失败[:：]\\s*(.*)$",
+    "Falha no teste: $1"
+  ],
+  [
+    "^创作者登录启动失败[:：]\\s*(.*)$",
+    "Falha ao iniciar login de criador: $1"
+  ],
+  [
+    "^失败[:：]\\s*(.*)$",
+    "Erro: $1"
+  ],
+  [
+    "^5\\s+\\?\\s+`\\s+等共\\s+(.+?)\\s+个账号`\\s+:\\s+`（共\\s+(.+?)\\s+个账号）`;\\s+const\\s+ok\\s+=\\s+await\\s+window\\.uiConfirm\\?\\.\\(\\{\\s+title:\\s+`批量删除\\s+(.+?)\\s+个账号`,\\s+message:\\s+`即将删除：(.+?)(.+?)。\\\\n删除后将取消未执行任务、停用关联规则与监控并清理独占登录环境，历史内容保留；有任务正在执行中的账号将自动跳过。`,\\s+okText:\\s+`确认删除\\s+\\((.+?)\\)`,\\s+danger:\\s+true,\\s+\\}\\);\\s+if\\s+\\(!ok\\)\\s+return;\\s+batchCancelRef\\.current\\s+=\\s+false;\\s+setBatchProgress\\((.+?)\\);\\s+const\\s+deletedIds\\s+=\\s+\\[\\];\\s+const\\s+failed\\s+=\\s+\\[\\];\\s+for\\s+\\(let\\s+i\\s+=\\s+0;\\s+i$",
+    "5 ? ` e mais ($1 Contas no total)` : ` ($2 Contas no total)`; const ok = await window.uiConfirm?.({ title: `Excluir $3 Contas em lote`, message: `Prestes a excluir: $4$5.\\nApós a exclusão, tarefas pendentes serão canceladas, regras e Monitoramento associados serão desativados e o ambiente exclusivo de login será limpo, mantendo o conteúdo histórico; Contas com tarefas em execução serão ignoradas automaticamente.`, okText: `Confirmar exclusão ($6)`, danger: true, }); if (!ok) return; batchCancelRef.current = false; setBatchProgress($7); const deletedIds = []; const failed = []; for (let i = 0; i"
+  ],
+  [
+    "^已自动防呆切至「本机直连」：检测到代理池内现有可用节点均为境外\\s+IP，海外住宅代理商通常会屏蔽「(.+?)」等大陆域名导致连接失败（ERR_SOCKS_CONNECTION_FAILED）。如需多号防关联，请点「手动输入」添加中国大陆代理。$",
+    "Alternado automaticamente para \"Conexão direta local\": todos os nós disponíveis no pool de proxies são IPs internacionais, e provedores residenciais costumam bloquear domínios da China continental como \"$1\" (ERR_SOCKS_CONNECTION_FAILED). Para isolar múltiplas contas, clique em \"Inserir manualmente\" e adicione um proxy da China continental."
+  ],
+  [
+    "^近\\s+7\\s+天创建的任务中，失败\\s+/\\s+部分完成\\s+/\\s+结果不确定：(.+?)\\s+项。按\\s+UTC\\s+创建时间筛选，统计当前状态，不代表历史成功率。数据未实时向平台刷新；账号选择仅限制本次分析。$",
+    "Entre as tarefas criadas nos últimos 7 dias, falhas / parciais / incertas: $1. Filtrado por data de criação em UTC considerando o status atual, não representa a taxa histórica de sucesso. Os dados não são atualizados em tempo real na plataforma; a seleção de Conta limita apenas esta análise."
+  ],
+  [
+    "^;\\s+\\}\\s+function\\s+TokenUsage\\((.+?)\\)\\s+\\{\\s+const\\s+usage\\s+=\\s+usageFor\\(run\\),\\s+costs\\s+=\\s+usage\\.costs\\s+\\|\\|\\s+\\[\\];\\s+const\\s+hint\\s+=\\s+usage\\.status\\s+===\\s+\"legacy\"\\s+\\?\\s+\"旧记录用量，未记录完整明细\"\\s+:\\s+usage\\.status\\s+===\\s+\"partial\"\\s+\\?\\s+`仅已返回部分\\s+·\\s+(.+?)/(.+?)\\s+次调用用量完整`\\s+:\\s+usage\\.status\\s+===\\s+\"reported\"\\s+\\?\\s+`(.+?)\\s+次模型调用合计`\\s+:\\s+pending\\(run\\)\\s+\\?\\s+\"等待上游\\s+usage，收到统计事件后更新\"\\s+:\\s+\"上游未返回完整用量，不代表消耗为\\s+0\";\\s+return$",
+    "; } function TokenUsage($1) { const usage = usageFor(run), costs = usage.costs || []; const hint = usage.status === \"legacy\" ? \"Uso de registro legado, sem detalhamento completo\" : usage.status === \"partial\" ? `Retorno parcial · $2/$3 chamadas com uso completo` : usage.status === \"reported\" ? `Total de $4 chamadas de modelo` : pending(run) ? \"Aguardando usage upstream; será atualizado após receber o evento de estatísticas\" : \"O upstream não retornou o uso completo; isso não significa consumo 0\"; return"
+  ],
+  [
+    "^\\{catalogLoading\\s+\\?\\s+\"正在读取上游模型目录…\"\\s+:\\s+catalog\\s+\\?\\s+`本次获取\\s+(.+?)\\s+个模型(.+?)(.+?)\\s+个无效条目`\\s+:\\s+\"\"\\}。(.+?)\\s+个，勾选更新后再保存配置。`\\s+:\\s+\"上游未返回可选模型，仍可手动填写模型\\s+ID。\"\\}(.+?)`\\s+:\\s+settings\\.models\\.length\\s+\\?\\s+`目录共\\s+(.+?)\\s+个模型。`\\s+:\\s+\"\"\\}$",
+    "{catalogLoading ? \"Carregando catálogo de modelos upstream…\" : catalog ? `$1 modelos obtidos$2$3 entradas inválidas ignoradas` : \"\"}. $4 no catálogo; marque para atualizar antes de salvar a configuração.` : \"O upstream não retornou modelos selecionáveis; ainda é possível informar o ID do modelo manualmente.\"}$5` : settings.models.length ? `Total de $6 modelos no catálogo.` : \"\"}"
+  ],
+  [
+    "^\\}(.+?)。\\\\n删除后将取消未执行任务、停用关联规则与监控并清理独占登录环境，历史内容保留；有任务正在执行中的账号将自动跳过。$",
+    "}$1.\\nApós a exclusão, tarefas pendentes serão canceladas, regras e monitoramentos vinculados serão desativados e ambientes de login exclusivos serão limpos (histórico mantido); contas com tarefas em execução serão ignoradas automaticamente."
+  ],
+  [
+    "^所属平台：(.+?)。建议尽量保持「一号一独立代理」；切换代理后会自动关闭该账号当前常驻浏览器上下文，下次任务使用新网络出口。$",
+    "Rede: $1. Recomenda-se manter \"um proxy exclusivo por conta\"; ao trocar o proxy, o contexto de navegador residente atual desta conta será fechado automaticamente e a próxima tarefa usará a nova saída de rede."
+  ],
+  [
+    "^将为\\s+(.+?)\\s+个尚未配置代理的账号从池内自动分配（优先空闲独立且地区匹配的节点，池余量不足时按最少占用复用）。是否继续？$",
+    "Serão atribuídos proxies do pool automaticamente para $1 conta(s) sem proxy (priorizando nós livres exclusivos com região compatível; se faltar, reutilizando os menos ocupados). Deseja continuar?"
+  ],
+  [
+    "^\\{ready\\s+\\?\\s+\"方便时安装并重启，账号与配置会保留。\"\\s+:\\s+downloading\\s+\\?\\s+`(.+?)\\s+/\\s+(.+?)\\s+·\\s+支持断点续传`\\s+:\\s+update\\.status\\s+===\\s+\"available\"\\s+\\?\\s+\"可先查看更新说明，再决定是否更新。\"\\s+:\\s+update\\.message\\}$",
+    "{ready ? \"Instale e reinicie quando for conveniente; Contas e configurações serão mantidas.\" : downloading ? `$1 / $2 · Suporta retomada de download` : update.status === \"available\" ? \"Confira as notas da versão antes de decidir atualizar.\" : update.message}"
+  ],
+  [
+    "^通道已开启(.+?)\\s+✓\\s+点击上方「复制桥接链接并打开微信」，在「文件传输助手」粘贴点开即自动连通$",
+    "Canal ativado$1 ✓ Clique em \"Copiar link bridge e abrir WeChat\" acima, cole e abra em \"Transferência de Arquivos\" para conectar automaticamente"
+  ],
+  [
+    "^(.+?);\\s+//\\s+Local\\s+lookup\\s+explicitly\\s+searches\\s+loaded\\s+records,\\s+not\\s+an\\s+implied\\s+API\\-wide\\s+search\\.\\s+for\\s+\\(const\\s+\\[id,\\s+key,\\s+label,\\s+selector\\]\\s+of\\s+\\[\\s+\\[\"collection\\-job\\-table\",\\s+\"collection\",\\s+\"关键词、任务状态\",\\s+\"\\.collection\\-task\"\\],\\s+\\[\"pub\\-table\",\\s+\"publish\",\\s+\"发布标题、状态\",\\s+\"tr:not\\(:has\\(\\[colspan\\]\\)\\)\"\\],\\s+\\[\"ac\\-rule\\-table\",\\s+\"rule\",\\s+\"评论规则、目标\",\\s+\"tr:not\\(:has\\(\\[colspan\\]\\)\\)\"\\],\\s+\\[\"n\\-table\",\\s+\"channel\",\\s+\"通知渠道、类型\",\\s+\"tbody\\s+tr:not\\(:has\\(\\[colspan\\]\\)\\)\"\\],\\s+\\[\"proxy\\-table\",\\s+\"proxy\",\\s+\"代理备注、地址或归属地\",\\s+\"tbody\\s+tr:not\\(:has\\(\\[colspan\\]\\)\\)\"\\],\\s+\\]\\)\\s+\\{\\s+const\\s+container\\s+=\\s+\\$\\(id\\);\\s+const\\s+target\\s+=\\s+container\\.closest\\(\"\\.table\\-wrap\"\\)\\s+\\|\\|\\s+container;\\s+const\\s+anchor\\s+=\\s+id\\s+===\\s+\"collection\\-job\\-table\"\\s+\\?\\s+\\(\\$\\(\"collection\\-bulk\\-bar\"\\)\\s+\\|\\|\\s+target\\)\\s+:\\s+target;\\s+const\\s+toolbar\\s+=\\s+document\\.createElement\\(\"div\"\\);\\s+toolbar\\.className\\s+=\\s+\"wb\\-list\\-tools\";\\s+toolbar\\.innerHTML\\s+=\\s+`$",
+    "$1; // Local lookup explicitly searches loaded records, not an implied API-wide search. for (const [id, key, label, selector] of [ [\"collection-job-table\", \"collection\", \"Palavra-chave, status da tarefa\", \".collection-task\"], [\"pub-table\", \"publish\", \"Título da publicação, status\", \"tr:not(:has([colspan]))\"], [\"ac-rule-table\", \"rule\", \"Regra de Comentário, alvo\", \"tr:not(:has([colspan]))\"], [\"n-table\", \"channel\", \"Canal de notificação, tipo\", \"tbody tr:not(:has([colspan]))\"], [\"proxy-table\", \"proxy\", \"Observação do Proxy, endereço ou região\", \"tbody tr:not(:has([colspan]))\"], ]) { const container = $$(id); const target = container.closest(\".table-wrap\") || container; const anchor = id === \"collection-job-table\" ? ($$(\"collection-bulk-bar\") || target) : target; const toolbar = document.createElement(\"div\"); toolbar.className = \"wb-list-tools\"; toolbar.innerHTML = `"
+  ],
+  [
+    "^通过当前列表中\\s+(.+?)\\s+的\\s+(.+?)\\s+条可发草稿？通过后引擎按每账号每日上限和最小间隔陆续发出。$",
+    "Aprovar os rascunhos de $1 ($2 pronto(s) para envio) na lista atual? O motor enviará gradualmente conforme o limite diário por conta e intervalo mínimo."
+  ],
+  [
+    "^确认删除选中的\\s+(.+?)\\s+个评论监控配置吗？已抓取的评论记录会保留，并标注原任务已删除。$",
+    "Confirma a exclusão das $1 configurações de monitoramento de comentários selecionadas? Os comentários já capturados serão mantidos com indicação de que a tarefa original foi excluída."
+  ],
+  [
+    "^请确认已人工检查「(.+?)」的登录态、验证码和网络出口。解除后待执行任务可能继续运行。$",
+    "Confirme que verificou manualmente a sessão de login, captcha e saída de rede de \"$1\". Após liberar, tarefas pendentes poderão retomar."
+  ],
+  [
+    "^抓取完成，新增\\s+(.+?)\\s+条记录；已刷新\\s+(.+?)\\s+条失败记录的访问参数，可在作品记录中手动重试。$",
+    "Captura concluída, $1 novo(s) registro(s); parâmetros de acesso atualizados para $2 registro(s) com falha (tente novamente nos registros de posts)."
+  ],
+  [
+    "^确认删除选中的\\s+(.+?)\\s+个采集任务及其作品、评论记录吗？本地已下载文件不会被删除。$",
+    "Confirma a exclusão das $1 tarefas de coleta selecionadas e seus registros de posts e comentários? Arquivos locais já baixados não serão excluídos."
+  ],
+  [
+    "^`(.+?)\\s+(.+?)`\\)\\.join\\(\"\\s+\\+\\s+\"\\)\\}（上游回报，账单为准）`\\s+:\\s+pending\\(run\\)\\s+\\?\\s+\"等待上游回报\"\\s+:\\s+\"上游未返回可核对金额，请以上游账单为准\"\\}$",
+    "`$1 $2`).join(\" + \")} (reportado pelo upstream; prevalece a fatura)` : pending(run) ? \"Aguardando retorno do upstream\" : \"O upstream não retornou valor conferível; consulte a fatura do upstream\"}"
+  ],
+  [
+    "^确认删除选中的\\s+(.+?)\\s+个作品监控任务吗？已抓取的作品记录与本地文件会保留。$",
+    "Confirma a exclusão das $1 tarefas de monitoramento de posts selecionadas? Os registros e arquivos locais já coletados serão mantidos."
+  ],
+  [
+    "^\\\\n⚠️\\s+当前有\\s+(.+?)\\s+个账号正在引用该代理，删除后请及时核对这些账号的代理设置。$",
+    "\\n⚠️ $1 conta(s) está(ão) usando este proxy; verifique as configurações de proxy dessas contas após excluir."
+  ],
+  [
+    "^注意：当前勾选了\\s+(.+?)\\s+个标记为「采集小号」的账号，确认是否也要用于公开发布。$",
+    "Atenção: $1 Contas selecionadas estão marcadas como \"Conta auxiliar de Coleta\"; confirme se também devem ser usadas para Publicar."
+  ],
+  [
+    "^通道已开启(.+?)\\s+✓\\s+请按上方引导点「①\\s+一键重开微信」→「②\\s+复制桥接链接并打开微信」$",
+    "Canal ativado$1 ✓ Siga as instruções acima: \"① Reiniciar WeChat com 1 clique\" → \"② Copiar link bridge e abrir WeChat\""
+  ],
+  [
+    "^当前渠道「(.+?)」尚未配置接口地址或模型\\s+ID，请先到\\s+AI\\s+助手模型设置中补全保存。$",
+    "O canal atual \"$1\" ainda não tem URL de API ou ID de modelo configurado; preencha e salve nas configurações de modelo do Assistente de IA."
+  ],
+  [
+    "^当前平台的(.+?)记录汇总；点击来源任务可单独查看。抓取时间指首次入库。$",
+    "Resumo de registros de $1 da rede atual; clique na tarefa de origem para ver individualmente. O horário de coleta refere-se à primeira captura."
+  ],
+  [
+    "^0\\s+\\?\\s+`已复用\\s+(.+?)\\s+下载缓存。`\\s+:\\s+\"下载期间可继续使用工作台。\"\\}取消后保留下载进度。$",
+    "0 ? `Cache de download de $1 reutilizado.` : \"Você pode continuar usando o painel durante o download.\"}O progresso é mantido ao cancelar."
+  ],
+  [
+    "^⚠️\\s+提醒：所选代理已在同平台绑定\\s+(.+?)\\s+个账号，共用同一出口\\s+IP\\s+存在关联风险$",
+    "⚠️ Aviso: o proxy selecionado já está vinculado a $1 conta(s) na mesma rede; compartilhar o mesmo IP de saída gera risco de vínculo"
+  ],
+  [
+    "^当前路由：(.+?)。开启下方总开关并保存后，勾选\\s+AI\\s+的自动评论规则即可生效。$",
+    "Rota atual: $1. Após ativar o botão geral abaixo e salvar, as regras de comentário automático com IA marcadas entrarão em vigor."
+  ],
+  [
+    "^将安全停止\\s+(.+?)\\s+个所选任务。执行中的发布、评论和私信不会被强制中断。$",
+    "$1 tarefa(s) selecionada(s) será(ão) parada(s) com segurança. Publicações, comentários e DMs em execução não serão interrompidos à força."
+  ],
+  [
+    "^将删除「(.+?)」的本地配置、密钥和模型目录。不会删除上游账号或分析历史。$",
+    "Serão removidos a configuração local, as chaves e o catálogo de modelos de \"$1\". A Conta upstream e o histórico de análises não serão excluídos."
+  ],
+  [
+    "^将优先从池内分配「空闲独立\\s+\\+\\s+地区匹配」节点，确保「(.+?)」一号一独立出口\\s+IP。$",
+    "Priorizará nós \"livres exclusivos + região compatível\" do pool, garantindo um IP de saída exclusivo por conta para \"$1\"."
+  ],
+  [
+    "^当前非零旧限额：(.+?)。建议一键清零后统一在「风控中心\\s+→\\s+风控规则」管理。$",
+    "Limites legados não zerados: $1. Recomenda-se zerar com 1 clique e gerenciar tudo em \"Central Antifraude → Regras Antifraude\"."
+  ],
+  [
+    "^通过已选的\\s+(.+?)\\s+条草稿？通过后引擎按风控上限与最小间隔陆续发出。$",
+    "Aprovar os $1 rascunhos selecionados? O motor enviará gradualmente conforme o limite antifraude e intervalo mínimo."
+  ],
+  [
+    "^\\{ready\\s+\\?\\s+`CreatorHub\\s+(.+?)\\s+已准备好`\\s+:\\s+downloading\\s+\\?\\s+\"正在下载新版，当前任务继续运行\"\\s+:\\s+installing\\s+\\?\\s+\"正在安装新版\"\\s+:\\s+`发现\\s+CreatorHub\\s+(.+?)`\\}$",
+    "{ready ? `CreatorHub $1 está pronto` : downloading ? \"Baixando nova versão; as tarefas atuais continuam em execução\" : installing ? \"Instalando nova versão\" : `Nova versão do CreatorHub $2 disponível`}"
+  ],
+  [
+    "^同时下载\\s+(.+?)\\s+个\\s+·\\s+同时采集\\s+(.+?)\\s+个\\s+·\\s+活跃账号上限\\s+(.+?)\\s+·\\s+常驻浏览器上限\\s+(.+?)\\s+个$",
+    "Downloads simultâneos: $1 · Coletas simultâneas: $2 · Limite de contas ativas: $3 · Limite de navegadores residentes: $4"
+  ],
+  [
+    "^\\\\n⚠️\\s+其中关联了\\s+(.+?)\\s+个账号引用，删除后请核对相关账号代理设置。$",
+    "\\n⚠️ Há $1 conta(s) vinculada(s); verifique as configurações de proxy dessas contas após excluir."
+  ],
+  [
+    "^已删除\\s+(.+?)\\s+个采集任务，另有\\s+(.+?)\\s+个正在执行中已跳过（请先取消）$",
+    "$1 tarefa(s) de coleta excluída(s); $2 em execução ignorada(s) (cancele antes)"
+  ],
+  [
+    "^仅查看任务\\s+\\#(.+?)\\s+的记录(.+?)；抓取时间指首次入库，重试不会改写。$",
+    "Exibindo apenas registros da tarefa #$1$2; a data de coleta refere-se à primeira captura e não muda em novas tentativas."
+  ],
+  [
+    "^已将「(.+?)」设为当前操作品牌频道（互动\\s+/\\s+观看\\s+/\\s+发布已同步填入）$",
+    "\"$1\" definido como canal de marca ativo (interação / visualização / publicação sincronizados)"
+  ],
+  [
+    "^(.+?)\\s+·\\s+切换时会关闭该账号当前浏览器，下次任务使用新内核。$",
+    "$1 · Ao alternar, o navegador atual desta conta será fechado e a próxima tarefa usará o novo kernel."
+  ],
+  [
+    "^f\\.path\\),\\s+title,\\s+desc,\\s+topics,\\s+scheduled_at:\\s+isoWhen,\\s+stagger_minutes:\\s+Number\\(staggerMinutes\\s+\\|\\|\\s+0\\),\\s+source_platform:\\s+sourceMeta\\.source_platform,\\s+source_content_id:\\s+sourceMeta\\.source_content_id,\\s+platform_overrides:\\s+overrides,\\s+\\}\\),\\s+\\}\\);\\s+matrixToast\\(\\s+`已成功创建\\s+(.+?)\\s+条跨账号发布任务(.+?)\\s+个不满足条件的账号）`\\s+:\\s+\"\"\\}`,\\s+\"ok\",\\s+6000\\s+\\);\\s+setTitle\\(\"\"\\);\\s+setDesc\\(\"\"\\);\\s+setTopics\\(\"\"\\);\\s+setUploadedFiles\\(\\[\\]\\);\\s+setSourceMeta\\((.+?)\\);\\s+if\\s+\\(typeof\\s+window\\.refreshPublish\\s+===\\s+\"function\"\\)\\s+window\\.refreshPublish\\(\\);\\s+window\\.CreatorHubWorkbench\\?\\.showSection\\?\\.\\(\"publish\",\\s+\"records\"\\);\\s+\\}\\s+catch\\s+\\(err\\)\\s+(.+?)\\s+finally\\s+(.+?)\\s+\\};\\s+return\\s+\\($",
+    "f.path), title, desc, topics, scheduled_at: isoWhen, stagger_minutes: Number(staggerMinutes || 0), source_platform: sourceMeta.source_platform, source_content_id: sourceMeta.source_content_id, platform_overrides: overrides, }), }); matrixToast( `$1 tarefas de publicação entre Contas criadas com sucesso$2 Contas inelegíveis ignoradas)` : \"\"}`, \"ok\", 6000 ); setTitle(\"\"); setDesc(\"\"); setTopics(\"\"); setUploadedFiles([]); setSourceMeta($3); if (typeof window.refreshPublish === \"function\") window.refreshPublish(); window.CreatorHubWorkbench?.showSection?.(\"publish\", \"records\"); } catch (err) $4 finally $5 }; return ("
+  ],
+  [
+    "^同平台已有\\s+(.+?)\\s+个其他账号共用此代理，存在同\\s+IP\\s+关联风险$",
+    "$1 outra(s) conta(s) na mesma rede já usam este proxy; há risco de vínculo pelo mesmo IP"
+  ],
+  [
+    "^请说明已对「(.+?)」完成的人工检查。该内容会进入审计记录。$",
+    "Descreva a verificação manual concluída para \"$1\". Isso será registrado no log de auditoria."
+  ],
+  [
+    "^\\{busy\\s+\\?\\s+\"正在提交…\"\\s+:\\s+workflow\\.status\\s+===\\s+\"draft\"\\s+\\?\\s+`确认并创建\\s+(.+?)\\s+项任务`\\s+:\\s+\"确认继续未完成步骤\"\\}$",
+    "{busy ? \"Enviando…\" : workflow.status === \"draft\" ? `Confirmar e criar $1 tarefas` : \"Confirmar e continuar etapas pendentes\"}"
+  ],
+  [
+    "^·\\s+账号级监控\\s+·\\s+新会话自动纳入\\s+·\\s+(.+?)\\s+分钟完整补偿检查$",
+    "· Monitoramento por conta · Novas conversas incluídas automaticamente · Verificação completa a cada $1 min"
+  ],
+  [
+    "^已填入端点\\s+(.+?)，点击「测试通道连接」或「保存通道配置」$",
+    "Endpoint $1 preenchido; clique em \"Testar conexão do canal\" ou \"Salvar configuração do canal\""
+  ],
+  [
+    "^类型：(.+?)\\s+·\\s+密钥不回传到页面。修改后可发送测试通知。$",
+    "Tipo: $1 · A chave secreta não é retornada à página. Após editar, envie uma notificação de teste."
+  ],
+  [
+    "^已载入\\s+(.+?)\\s+项配置，请确认无误后点击「保存采集设置」$",
+    "$1 configuração(ões) carregada(s); confira e clique em \"Salvar configurações de coleta\""
+  ],
+  [
+    "^当前已关联\\s+(.+?)\\s+个账号，保存后会自动同步最新配置。$",
+    "$1 conta(s) vinculada(s) no momento; a configuração atualizada será sincronizada automaticamente ao salvar."
+  ],
+  [
+    "^风控规则已保存并生效，已自动放行\\s+(.+?)\\s+条等待任务$",
+    "Regras antifraude salvas e aplicadas; $1 tarefa(s) em espera liberada(s) automaticamente"
+  ],
+  [
+    "^\\{\\s+const\\s+ids\\s+=\\s+\\[\\.\\.\\.selectedIds\\];\\s+if\\s+\\(!ids\\.length\\s+\\|\\|\\s+batchProgress\\)\\s+return;\\s+batchCancelRef\\.current\\s+=\\s+false;\\s+const\\s+title\\s+=\\s+kind\\s+===\\s+\"proxy\"\\s+\\?\\s+\"批量检测代理与出口\"\\s+:\\s+\"批量刷新资料与登录态\";\\s+setBatchProgress\\((.+?)\\);\\s+let\\s+okCount\\s+=\\s+0;\\s+let\\s+failCount\\s+=\\s+0;\\s+for\\s+\\(let\\s+i\\s+=\\s+0;\\s+i$",
+    "{ const ids = [...selectedIds]; if (!ids.length || batchProgress) return; batchCancelRef.current = false; const title = kind === \"proxy\" ? \"Verificar Proxy e IP de saída em lote\" : \"Atualizar perfil e sessão de login em lote\"; setBatchProgress($1); let okCount = 0; let failCount = 0; for (let i = 0; i"
+  ],
+  [
+    "^发现\\s+(.+?)\\s+个候选\\s+·\\s+本次命中\\s+(.+?)\\s+条（纯预览，未发任何评论）$",
+    "$1 candidato(s) encontrado(s) · $2 correspondência(s) (apenas prévia, nenhum comentário enviado)"
+  ],
+  [
+    "^删除选中的\\s+(.+?)\\s+条历史记录\\?本地媒体文件会保留。$",
+    "Excluir os $1 registros de histórico selecionados? Os arquivos de mídia locais serão mantidos."
+  ],
+  [
+    "^生效预览：最小间隔\\s+(.+?)\\s+秒\\s+·\\s+\\$\\{ruleCap\\s+===\\s+0\\s+\\?\\s+\"规则日限不单独限制\"\\s+:$",
+    "Prévia ativa: intervalo mínimo $1 s · $${ruleCap === 0 ? \"Sem limite diário por regra\" :"
+  ],
+  [
+    "^(.+?)环境隔离异常：Profile\\s+与其他账号重复或尚未分配$",
+    "$1Isolamento de ambiente anormal: Profile duplicado com outra conta ou ainda não atribuído"
+  ],
+  [
+    "^最近\\s+(.+?)\\s+条\\s+·\\s+包含规则修改、人工探测和解除操作$",
+    "Últimos $1 · Inclui alterações de regra, verificações manuais e liberações"
+  ],
+  [
+    "^所选\\s+(.+?)\\s+个任务正在执行中，请先取消后再删除$",
+    "As $1 tarefa(s) selecionada(s) está(ão) em execução; cancele antes de excluir"
+  ],
+  [
+    "^\\{editingChannelId\\s+\\?\\s+`正在编辑：(.+?)\\)\\}(.+?)`\\s+:\\s+\"添加新渠道\\s+·\\s+保存后再选择使用\"\\}$",
+    "{editingChannelId ? `Editando: $1)}$2` : \"Adicionar novo canal · Salve antes de selecionar para uso\"}"
+  ],
+  [
+    "^1\\.\\s+选择分发目标账号（已选\\s+(.+?)\\s+个账号，跨\\s+(.+?)\\s+个平台）$",
+    "1. Selecione as Contas de destino ($1 Contas selecionadas em $2 Redes)"
+  ],
+  [
+    "^账号已删除，取消\\s+(.+?)\\s+个任务，暂停\\s+(.+?)\\s+项规则/监控$",
+    "Conta excluída, $1 tarefa(s) cancelada(s), $2 regra(s)/monitoramento(s) pausado(s)"
+  ],
+  [
+    "^:\\s+\"上游未返回可选模型，仍可手动填写模型\\s+ID。\"\\}(.+?)$",
+    ": \"O provedor não retornou modelos; você ainda pode inserir o ID do modelo manualmente.\"}$1"
+  ],
+  [
+    "^本次扫码未完成\\s+\\((.+?)\\)，可点重试或跳到下一个$",
+    "QR Code não concluído ($1); clique em tentar novamente ou pular para o próximo"
+  ],
+  [
+    "^，比完整包少下载\\s+(.+?)；未变化的文件继续复用。$",
+    ", $1 a menos que o pacote completo; arquivos inalterados são reutilizados."
+  ],
+  [
+    "^<label\\s+class=\"collection\\-task\\-check(.+?)\"\\s+title=\"\\$\\{isRunning\\s+\\?\\s+\"正在执行中的任务需先取消后再删除\"\\s+:$",
+    "<label class=\"collection-task-check$1\" title=\"$${isRunning ? \"Tarefas em execução precisam ser canceladas antes de excluir\" :"
+  ],
+  [
+    "^分析(.+?)任务\\s+\\#(.+?)\\s+的状态、可能原因和处理步骤。$",
+    "Analisar status, possíveis causas e próximos passos da tarefa $1 #$2."
+  ],
+  [
+    "^已套用「(.+?)」方案\\s+·\\s+点击「保存并立即生效」应用$",
+    "Perfil \"$1\" aplicado · Clique em \"Salvar e aplicar agora\""
+  ],
+  [
+    "^已清除\\s+(.+?)\\s+个账号代理（当前改走本机直连）$",
+    "Proxy removido de $1 conta(s) (usando conexão direta local)"
+  ],
+  [
+    "^(.+?)\\s+再次执行需要浏览器的操作即可重试。$",
+    "$1 Execute novamente a operação que requer o navegador para tentar outra vez."
+  ],
+  [
+    "^\\{submitting\\s+\\?\\s+\"正在拆分入队…\"\\s+:\\s+`一键入队分发\\s+\\((.+?)\\s+个账号\\)`\\}$",
+    "{submitting ? \"Enfileirando…\" : `Enfileirar distribuição ($1 Contas)`}"
+  ],
+  [
+    "^部分完成：已获取\\s+(.+?)\\s+条作品，(.+?)\\s+条详情失败。(.+?)$",
+    "Parcialmente concluído: $1 post(s) obtido(s), $2 falha(s) nos detalhes.$3"
+  ],
+  [
+    "^✓\\s+连通正常（(.+?)）(.+?)\\s+—\\s+点击「加入代理池」即可保存$",
+    "✓ Conectividade OK ($1)$2 — Clique em \"Adicionar ao pool de proxies\" para salvar"
+  ],
+  [
+    "^\\}(.+?)；抓取时间指首次入库，不是(.+?)发送时间。$",
+    "}$1; o horário de coleta refere-se à primeira captura, não ao horário de envio de $2."
+  ],
+  [
+    "^最近\\s+(.+?)\\s+条\\s+·\\s+不保存响应正文或账号凭据$",
+    "Últimos $1 · Não armazena corpo de resposta nem credenciais da conta"
+  ],
+  [
+    "^批量设置账号职能角色（已选\\s+(.+?)\\s+个账号）$",
+    "Definir função da conta em lote ($1 conta(s) selecionada(s))"
+  ],
+  [
+    "^检查间隔保护中，已展示\\s+(.+?)\\s+个现有会话$",
+    "Proteção de intervalo de verificação ativa; exibindo $1 conversa(s) existente(s)"
+  ],
+  [
+    "^已删除\\s+(.+?)\\s+条历史记录，本地文件未删除$",
+    "$1 registro(s) de histórico excluído(s); arquivos locais mantidos"
+  ],
+  [
+    "^已删除\\s+(.+?)\\s+个采集任务，本地文件已保留$",
+    "$1 tarefa(s) de coleta excluída(s); arquivos locais mantidos"
+  ],
+  [
+    "^已删除\\s+(.+?)\\s+个评论监控，评论记录已保留$",
+    "$1 monitoramento(s) de comentários excluído(s); registros mantidos"
+  ],
+  [
+    "^可选：单独覆盖(.+?)标题（留空沿用主标题）$",
+    "Opcional: substituir título de $1 (deixe vazio para usar o principal)"
+  ],
+  [
+    "^\\{groupModal\\.mode\\s+===\\s+\"edit\"\\s+\\?\\s+`编辑矩阵组「(.+?)」`\\s+:\\s+\"新建跨平台矩阵分组\"\\}$",
+    "{groupModal.mode === \"edit\" ? `Editar grupo de Matriz \"$1\"` : \"Novo grupo de Matriz multiplataforma\"}"
+  ],
+  [
+    "^AI\\s+路由：(.+?)\\s+·\\s+扫描范围默认最近\\s+(.+?)\\s+条作品\\s+/\\s+(.+?)\\s+天。$",
+    "Rota de IA: $1 · Escopo padrão: últimos $2 posts / $3 dias."
+  ],
+  [
+    "^养号完成：观看\\s+(.+?)\\s+条视频，随机点赞\\s+(.+?)\\s+条$",
+    "Aquecimento concluído: $1 vídeo(s) assistido(s), $2 curtida(s) aleatória(s)"
+  ],
+  [
+    "^首行标题（可选，正文与话题合并\\s+≤(.+?)\\s+字）$",
+    "Título na 1ª linha (opcional, texto + hashtags ≤$1 caracteres)"
+  ],
+  [
+    "^已保存并生效（已放行\\s+(.+?)\\s+条等待任务）$",
+    "Salvo e aplicado ($1 tarefa(s) em espera liberada(s))"
+  ],
+  [
+    "^批量切换浏览器内核（已选\\s+(.+?)\\s+个账号）$",
+    "Alternar kernel do navegador em lote ($1 conta(s) selecionada(s))"
+  ],
+  [
+    "^批量切换为本机直连（已选\\s+(.+?)\\s+个账号）$",
+    "Alternar em lote para conexão direta local ($1 conta(s) selecionada(s))"
+  ],
+  [
+    "^确定从代理池删除已选的\\s+(.+?)\\s+个节点？$",
+    "Deseja excluir os $1 nós selecionados do pool de proxies?"
+  ],
+  [
+    "^删除选中的\\s+(.+?)\\s+条作品及其本地文件\\?$",
+    "Excluir os $1 posts selecionados e seus arquivos locais?"
+  ],
+  [
+    "^展开其余\\s+(.+?)\\s+个暂未添加账号的平台$",
+    "Expandir mais $1 rede(s) sem contas adicionadas"
+  ],
+  [
+    "^已安全关闭并保存\\s+(.+?)\\s+个浏览器会话$",
+    "$1 sessão(ões) de navegador fechada(s) e salva(s) com segurança"
+  ],
+  [
+    "^已为\\s+(.+?)\\s+个无代理账号分配池节点\\$\\{r\\.shared_assigned\\s+\\?$",
+    "Nó do pool atribuído a $1 conta(s) sem proxy$${r.shared_assigned ?"
+  ],
+  [
+    "^已成功创建\\s+(.+?)\\s+条跨账号发布任务\\$\\{res\\.skipped_count\\s+\\?$",
+    "$1 tarefa(s) de publicação multiconta criada(s) com sucesso$${res.skipped_count ?"
+  ],
+  [
+    "^阶梯\\s+(.+?)\\s+分\\s+·\\s+探测间隔\\s+(.+?)\\s+分\\s+·\\s+成功\\s+(.+?)\\s+次恢复$",
+    "Escalonado $1 min · Intervalo de verificação $2 min · Recupera após $3 sucesso(s)"
+  ],
+  [
+    "^抓取完成,检查\\s+(.+?)\\s+条，筛除\\s+(.+?)\\s+条，新增\\s+(.+?)\\s+条$",
+    "Captura concluída: $1 verificado(s), $2 filtrado(s), $3 novo(s)"
+  ],
+  [
+    "^确认使用当前所选\\s+YouTube\\s+账号对「(.+?)」执行(.+?)？$",
+    "Confirmar execução de $1 em \"$2\" usando a conta do YouTube selecionada?"
+  ],
+  [
+    "^正在搜索「(.+?)」并模拟浏览观看（共\\s+(.+?)\\s+条）…$",
+    "Buscando \"$1\" e simulando navegação e visualização ($2 vídeo(s))…"
+  ],
+  [
+    "^全平台共\\s+(.+?)\\s+个账号\\s+·\\s+(.+?)\\s+项待关注状态$",
+    "$1 conta(s) em todas as redes · $2 item(ns) requer(em) atenção"
+  ],
+  [
+    "^识别到(.+?)链接，与当前(.+?)页面不匹配$",
+    "Link $1 identificado, não corresponde à página $2 atual"
+  ],
+  [
+    "^(.+?)（系统不强制拦截，仍可继续使用）。$",
+    "$1 (o sistema não bloqueia; você pode continuar usando)."
+  ],
+  [
+    "^批量分配矩阵分组（已选\\s+(.+?)\\s+个账号）$",
+    "Atribuir grupo de matriz em lote ($1 conta(s) selecionada(s))"
+  ],
+  [
+    "^(.+?)已填入，点击「保存采集设置」生效$",
+    "$1 preenchido; clique em \"Salvar configurações de coleta\" para aplicar"
+  ],
+  [
+    "^(.+?)监控必须选择一个已登录账号$",
+    "O monitoramento de $1 requer uma conta conectada"
+  ],
+  [
+    "^扫描\\s+\\+(.+?)%\\s+·\\s+评论\\s+\\+(.+?)%\\s+·\\s+私信\\s+\\+(.+?)%\\s+·\\s+首跑\\s+(.+?)秒\\s+·\\s+重试\\s+(.+?)秒$",
+    "Varredura +$1% · Comentário +$2% · DM +$3% · 1ª execução $4s · Nova tentativa $5s"
+  ],
+  [
+    "^selectedIds\\.has\\(a\\.id\\)\\)\\s+\\?\\s+\"取消本页全选\"\\s+:\\s+`全选筛选结果\\s+\\((.+?)\\)`\\}$",
+    "selectedIds.has(a.id)) ? \"Desmarcar página atual\" : `Selecionar todos filtrados ($1)`}"
+  ],
+  [
+    "^本地数据摘要\\{metrics\\s+\\?\\s+`\\s+·\\s+(.+?)\\s+个账号\\s+/\\s+(.+?)\\s+项任务`\\s+:\\s+\"\"\\}$",
+    "Resumo de dados locais{metrics ? ` · $1 Contas / $2 tarefas` : \"\"}"
+  ],
+  [
+    "^任务\\s+(.+?)\\s+待执行\\s+/\\s+(.+?)\\s+执行中\\s+/\\s+(.+?)\\s+受阻\\s+/\\s+(.+?)\\s+失败$",
+    "Tarefas: $1 pendente / $2 em execução / $3 bloqueada / $4 falha"
+  ],
+  [
+    "^扫描完成：发现\\s+(.+?)\\s+个内核，新增\\s+(.+?)\\s+个$",
+    "Varredura concluída: $1 kernel(s) encontrado(s), $2 novo(s)"
+  ],
+  [
+    "^(.+?)（建议\\s+≤(.+?)\\s+字；单条规则可单独覆盖）$",
+    "$1 (recomendado ≤$2 caracteres; cada regra pode substituir)"
+  ],
+  [
+    "^\\\\n关联的\\s+(.+?)\\s+个作品监控也会暂停。$",
+    "\\n$1 monitoramento(s) de posts vinculado(s) também será(ão) pausado(s)."
+  ],
+  [
+    "^当前策略：自动分配（预计优先：(.+?)）$",
+    "Estratégia atual: alocação automática (prioridade prevista: $1)"
+  ],
+  [
+    "^已去除无关文案，提取出(.+?)链接\\s+✓$",
+    "Texto extra removido, link $1 extraído ✓"
+  ],
+  [
+    "^(.+?)\\s+个账号使用本机直连（无代理）$",
+    "$1 conta(s) em conexão direta local (sem proxy)"
+  ],
+  [
+    "^已按归属地自动命名\\s+(.+?)\\s+个节点$",
+    "$1 nó(s) renomeado(s) automaticamente por localização"
+  ],
+  [
+    "^请先在「账号」里完成(.+?)扫码登录$",
+    "Conclua primeiro o login via QR Code de $1 em \"Contas\""
+  ],
+  [
+    "^展开其余\\s+(.+?)\\s+个海外与扩展平台$",
+    "Expandir mais $1 rede(s) internacionais e estendidas"
+  ],
+  [
+    "^已完成\\s+(.+?)\\s+个账号作品同步刷新$",
+    "Sincronização de posts concluída para $1 conta(s)"
+  ],
+  [
+    "^暂无可选(.+?)，输入名称即可新建$",
+    "Nenhum(a) $1 disponível; digite um nome para criar"
+  ],
+  [
+    "^\\{update\\.asset_name\\s+\\?\\s+`Windows\\s+x64\\s+·\\s+(.+?)`\\s+:\\s+\"本次发布尚未提供\\s+Windows\\s+x64\\s+安装包。\"\\}$",
+    "{update.asset_name ? `Windows x64 · $1` : \"Esta versão ainda não oferece instalador Windows x64.\"}"
+  ],
+  [
+    "^监听\\s+127\\.0\\.0\\.1:(.+?)\\s+→\\s+CDP\\s+:(.+?)\\s+·\\s+(.+?)\\s+·\\s+已转发\\s+(.+?)\\s+条命令\\s+/\\s+(.+?)\\s+条结果$",
+    "Escutando 127.0.0.1:$1 → CDP :$2 · $3 · $4 comando(s) / $5 resultado(s) encaminhado(s)"
+  ],
+  [
+    "^有\\s+(.+?)\\s+条草稿待审核（可发送\\s+(.+?)\\s+条\\$\\{emptyDrafts\\s+\\?$",
+    "$1 rascunho(s) aguardando revisão ($2 pronto(s) para envio$${emptyDrafts ?"
+  ],
+  [
+    "^\\{state\\s+\\?\\s+`桌面版\\s+(.+?)`\\s+:\\s+\"正在连接启动中心\"\\}$",
+    "{state ? `Versão Desktop $1` : \"Conectando à Central de Inicialização\"}"
+  ],
+  [
+    "^已同步\\s+(.+?)\\s+个可管理频道（通道：(.+?)）$",
+    "$1 canal(is) gerenciável(is) sincronizado(s) (via: $2)"
+  ],
+  [
+    "^同步完成：(.+?)\\s+个会话，新增消息\\s+(.+?)$",
+    "Sincronização concluída: $1 conversa(s), $2 nova(s) mensagem(ns)"
+  ],
+  [
+    "^已核对\\s+(.+?)\\s+项能力、(.+?)\\s+个账号环境$",
+    "$1 recurso(s) e $2 ambiente(s) de conta verificado(s)"
+  ],
+  [
+    "^共\\s+(.+?)\\s+张\\s+·\\s+拖拽排序\\s+·\\s+首图为封面$",
+    "$1 imagem(ns) · Arraste para ordenar · A 1ª é a capa"
+  ],
+  [
+    "^批量追加标签（已选\\s+(.+?)\\s+个账号）$",
+    "Adicionar tags em lote ($1 conta(s) selecionada(s))"
+  ],
+  [
+    "^(.+?)\\s+个代理连接异常\\s+/\\s+指纹漂移$",
+    "$1 erro(s) de proxy / desvio de fingerprint"
+  ],
+  [
+    "^正在打开隔离浏览器执行「(.+?)」…$",
+    "Abrindo navegador isolado para executar \"$1\"…"
+  ],
+  [
+    "^模型调用\\s+(.+?)\\s+·\\s+输入\\s+(.+?)\\s+/\\s+输出\\s+(.+?)\\s+/\\s+合计\\s+(.+?)\\s+token\\s+·\\s+(.+?)$",
+    "Chamadas de modelo $1 · Entrada $2 / Saída $3 / Total $4 tokens · $5"
+  ],
+  [
+    "^YouTube\\s+养号完成（观看\\s+(.+?)\\s+条\\s+/\\s+点赞\\s+(.+?)\\s+条）$",
+    "Aquecimento do YouTube concluído ($1 assistido(s) / $2 curtido(s))"
+  ],
+  [
+    "^已选择\\s+(.+?)\\s+条任务（含\\s+(.+?)\\s+条草稿）$",
+    "$1 tarefa(s) selecionada(s) (incl. $2 rascunho(s))"
+  ],
+  [
+    "^账号已保存\\((.+?)\\)，但状态异常：(.+?)$",
+    "Conta salva ($1), mas com status anormal: $2"
+  ],
+  [
+    "^(.+?)\\s+个同平台账号共用代理\\s+/\\s+IP$",
+    "$1 conta(s) na mesma rede compartilhando proxy / IP"
+  ],
+  [
+    "^(.+?)\\s+篇自有作品\\s+0播\\s+/\\s+状态预警$",
+    "$1 post(s) próprio(s) com 0 views / alerta de status"
+  ],
+  [
+    "^已接入\\s+(.+?)\\s+页，等待模块加载$",
+    "$1 página(s) conectada(s), aguardando carregamento de módulos"
+  ],
+  [
+    "^确认取消已选的\\s+(.+?)\\s+条任务？$",
+    "Confirmar cancelamento das $1 tarefas selecionadas?"
+  ],
+  [
+    "^缓存命中\\s+(.+?)（已含在输入中）$",
+    "Acerto de cache $1 (já incluído na entrada)"
+  ],
+  [
+    "^缓存写入\\s+(.+?)（已含在输入中）$",
+    "Escrita em cache $1 (já incluída na entrada)"
+  ],
+  [
+    "^一键回收全部已开窗口\\s+\\((.+?)\\)$",
+    "Recolher todas as janelas abertas ($1)"
+  ],
+  [
+    "^已上传准备\\s+(.+?)\\s+个素材文件$",
+    "$1 arquivo(s) de mídia enviado(s) e pronto(s)"
+  ],
+  [
+    "^请在可见窗口完成登录。(.+?)$",
+    "Conclua o login na janela visível.$1"
+  ],
+  [
+    "^采集(.+?)当前可返回的回复$",
+    "Coletar respostas atualmente retornáveis de $1"
+  ],
+  [
+    "^item\\.display_name\\s+\\|\\|\\s+\\(item\\.id\\s+===\\s+\"default\"\\s+\\?\\s+\"默认渠道\"\\s+:\\s+\"未命名渠道\"\\);\\s+const\\s+protocols\\s+=\\s+(.+?);\\s+export\\s+function\\s+ChannelList\\((.+?)\\)\\s+\\{\\s+const\\s+\\[removing,\\s+setRemoving\\]\\s+=\\s+useState\\(null\\);\\s+const\\s+\\[deleteError,\\s+setDeleteError\\]\\s+=\\s+useState\\(\"\"\\);\\s+const\\s+addButton\\s+=\\s+useRef\\(null\\),\\s+deleteButton\\s+=\\s+useRef\\(null\\);\\s+return$",
+    "item.display_name || (item.id === \"default\" ? \"Canal padrão\" : \"Canal sem nome\"); const protocols = $1; export function ChannelList($2) { const [removing, setRemoving] = useState(null); const [deleteError, setDeleteError] = useState(\"\"); const addButton = useRef(null), deleteButton = useRef(null); return"
+  ],
+  [
+    "^链接下载历史\\s+(.+?)\\s+Excel\\s+已导出\\$\\{!full\\s+\\&\\&\\s+count\\s+\\?$",
+    "Histórico de downloads por link $1 Excel exportado$${!full && count ?"
+  ],
+  [
+    "^负载：(.+?)\\s+\\((.+?)下载/(.+?)采集/(.+?)浏览器\\)$",
+    "Carga: $1 ($2 downloads/$3 coletas/$4 navegadores)"
+  ],
+  [
+    "^已删除\\s+(.+?)\\s+个，跳过/失败\\s+(.+?)\\s+个（(.+?)）$",
+    "$1 excluída(s), $2 ignorada(s)/falha(s) ($3)"
+  ],
+  [
+    "^已生成\\s+(.+?)\\s+条(.+?)（发现\\s+(.+?)\\s+个目标）$",
+    "$1 $2 gerado(s) ($3 alvo(s) encontrado(s))"
+  ],
+  [
+    "^同步完成:抓到\\s+(.+?)\\s+条,新增\\s+(.+?)(.+?)$",
+    "Sincronização concluída: $1 capturado(s), $2 novo(s)$3"
+  ],
+  [
+    "^今日新抓\\s+\\+(.+?)\\s+条\\s+·\\s+运行监控\\s+(.+?)$",
+    "Coletados hoje +$1 · Monitoramento ativo $2"
+  ],
+  [
+    "^已删除\\s+(.+?)\\s+条\\(清理\\s+(.+?)\\s+个文件\\)$",
+    "$1 excluído(s) ($2 arquivo(s) removido(s))"
+  ],
+  [
+    "^已保存的自定义人设（(.+?)\\s+/\\s+20）$",
+    "Personas personalizadas salvas ($1 / 20)"
+  ],
+  [
+    "^一键入队分发\\s+\\((.+?)\\s+个账号\\)$",
+    "Enfileirar distribuição em 1 clique ($1 conta(s))"
+  ],
+  [
+    "^评论抓取完成,新增\\s+(.+?)\\s+条$",
+    "Captura de comentários concluída, $1 novo(s)"
+  ],
+  [
+    "^核对任务\\s+\\#(.+?)\\s+的平台结果$",
+    "Verificar resultado na rede da tarefa #$1"
+  ],
+  [
+    "^已为\\s+(.+?)\\s+个账号分配代理$",
+    "Proxy atribuído a $1 conta(s)"
+  ],
+  [
+    "^等共\\s+(.+?)\\s+个微信相关进程$",
+    "e mais $1 processo(s) relacionado(s) ao WeChat"
+  ],
+  [
+    "^共\\s+(.+?)\\s+条符合条件的评论$",
+    "$1 comentário(s) elegível(is) no total"
+  ],
+  [
+    "^(.+?)\\s+个账号处于风控冷却$",
+    "$1 conta(s) em resfriamento antifraude"
+  ],
+  [
+    "^(.+?)\\s+条自动互动草稿待审$",
+    "$1 rascunho(s) de interação automática para revisão"
+  ],
+  [
+    "^请选择一个可用(.+?)账号$",
+    "Selecione uma conta $1 disponível"
+  ],
+  [
+    "^\\(filter\\s+===\\s+\"all\"\\s+\\|\\|\\s+\\[\"warning\",\\s+\"error\"\\]\\.includes\\(e\\.level\\)\\)\\s+\\&\\&\\s+`(.+?)\\s+(.+?)`\\.includes\\(query\\.trim\\(\\)\\)\\);\\s+const\\s+guide\\s+=\\s+platforms\\[route\\.slug\\];\\s+const\\s+mainHeading\\s+=\\s+route\\.page\\s+===\\s+\"workspace\"\\s+\\?\\s+\"工作空间\"\\s+:\\s+route\\.page\\s+===\\s+\"guides\"\\s+\\&\\&\\s+guide\\s+\\?\\s+guide\\.name\\s+\\+\\s+\"上手指南\"\\s+:\\s+pages\\[route\\.page\\]\\[0\\];\\s+return$",
+    "(filter === \"all\" || [\"warning\", \"error\"].includes(e.level)) && `$1 $2`.includes(query.trim())); const guide = platforms[route.slug]; const mainHeading = route.page === \"workspace\" ? \"Espaço de Trabalho\" : route.page === \"guides\" && guide ? \"Guia de Início: \" + guide.name : pages[route.page][0]; return"
+  ],
+  [
+    "^监听\\s+127\\.0\\.0\\.1:(.+?)\\s+·\\s+(.+?)(.+?)\\s+·\\s+(.+?)\\s+·\\s+已转发\\s+(.+?)\\s+条请求$",
+    "Escutando 127.0.0.1:$1 · $2$3 · $4 · $5 requisição(ões) encaminhada(s)"
+  ],
+  [
+    "^\\{downloading\\s+\\?\\s+`(.+?)\\s+/\\s+(.+?)`\\s+:\\s+\"下载\\s+→\\s+校验\\s+→\\s+备份\\s+→\\s+安装\"\\}$",
+    "{downloading ? `$1 / $2` : \"Baixar → Verificar → Backup → Instalar\"}"
+  ],
+  [
+    "^轻/重读\\s+(.+?)/(.+?)秒\\s+·\\s+跨功能\\s+(.+?)–(.+?)秒\\s+·\\s+\\$\\{slim\\s+>\\s+0\\s+\\?$",
+    "Leitura leve/pesada $1/$2s · Entre funções $3–$4s · $${slim > 0 ?"
+  ],
+  [
+    "^当前指向：(.+?)\\s+·\\s+(.+?)\\s+·\\s+默认模型\\s+(.+?)。$",
+    "Destino atual: $1 · $2 · Modelo padrão $3."
+  ],
+  [
+    "^检测完成：可连接\\s+(.+?)\\s+个\\$\\{failCount\\s+\\?$",
+    "Teste concluído: $1 conectável(is)$${failCount ?"
+  ],
+  [
+    "^同步完成:共\\s+(.+?)\\s+条,新增\\s+(.+?)(.+?)$",
+    "Sincronização concluída: $1 no total, $2 novo(s)$3"
+  ],
+  [
+    "^(.+?)(.+?)\\s+·\\s+连续\\s+(.+?)\\s+页无新增停止$",
+    "$1$2 · Parar após $3 pág. seguidas sem novidades"
+  ],
+  [
+    "^（完播占比\\s+(.+?)\\s+/\\s+视频总长\\s+(.+?)）$",
+    "(Taxa de conclusão $1 / Duração total $2)"
+  ],
+  [
+    "^找到\\s+(.+?)\\s+个模型\\s+·\\s+已选\\s+(.+?)\\s+个$",
+    "$1 modelos encontrados · $2 selecionados"
+  ],
+  [
+    "^已选\\s+(.+?)\\s+项（当前视图\\s+(.+?)\\s+项）$",
+    "$1 selecionado(s) ($2 na visualização atual)"
+  ],
+  [
+    "^观看完成：已看\\s+(.+?)\\s+秒（约\\s+(.+?)）$",
+    "Visualização concluída: $1 s assistidos (aprox. $2)"
+  ],
+  [
+    "^正在打开「(.+?)」\\((.+?)\\)\\s+登录窗口…$",
+    "Abrindo janela de login de \"$1\" ($2)…"
+  ],
+  [
+    "^请填写\\s+(.+?)–(.+?)\\s+之间的数值$",
+    "Informe um valor entre $1 e $2"
+  ],
+  [
+    "^跟随\\s+AI\\s+助手当前渠道\\s+·\\s+(.+?)$",
+    "Seguir canal atual do Assistente de IA · $1"
+  ],
+  [
+    "^发现\\s+(.+?)\\s+个目标，生成\\s+0\\s+条$",
+    "$1 alvo(s) encontrado(s), 0 gerado(s)"
+  ],
+  [
+    "^视频标题（必填，≤(.+?)\\s+字符）$",
+    "Título do vídeo (obrigatório, ≤$1 caracteres)"
+  ],
+  [
+    "^批量删除代理（共\\s+(.+?)\\s+个）$",
+    "Excluir proxies em lote ($1 no total)"
+  ],
+  [
+    "^已删除\\(清理\\s+(.+?)\\s+个文件\\)$",
+    "Excluído ($1 arquivo(s) removido(s))"
+  ],
+  [
+    "^(.+?)\\s+秒\\s+·\\s+首次不回填历史$",
+    "$1 s · Sem retroalimentação do histórico na primeira vez"
+  ],
+  [
+    "^配置扫码登录环境\\s+·\\s+(.+?)$",
+    "Configurar ambiente de login via QR Code · $1"
+  ],
+  [
+    "^风控保护运行中（(.+?)\\s+项）$",
+    "Proteção antifraude ativa ($1 item(ns))"
+  ],
+  [
+    "^删除选中的\\s+(.+?)\\s+条评论\\?$",
+    "Excluir os $1 comentários selecionados?"
+  ],
+  [
+    "^推理\\s+(.+?)（已含在输出中）$",
+    "Raciocínio $1 (já incluído na saída)"
+  ],
+  [
+    "^同屏高赞评论快览\\s+\\((.+?)\\)$",
+    "Prévia rápida de Comentários mais curtidos ($1)"
+  ],
+  [
+    "^已删除\\s+(.+?)\\s+个代理节点$",
+    "$1 nó(s) de proxy excluído(s)"
+  ],
+  [
+    "^已识别\\s+(.+?)\\s+条候选链接$",
+    "$1 link(s) candidato(s) identificado(s)"
+  ],
+  [
+    "^已删除\\s+(.+?)\\s+个作品监控$",
+    "$1 monitoramento(s) de posts excluído(s)"
+  ],
+  [
+    "^流式订阅读取失败（(.+?)）$",
+    "Falha na leitura do stream ($1)"
+  ],
+  [
+    "^确认并创建\\s+(.+?)\\s+项任务$",
+    "Confirmar e criar $1 tarefa(s)"
+  ],
+  [
+    "^已成功删除\\s+(.+?)\\s+个账号$",
+    "$1 conta(s) excluída(s) com sucesso"
+  ],
+  [
+    "^连续补登\\s+(.+?)\\s+个失效号$",
+    "Reautenticar em sequência $1 Contas expiradas"
+  ],
+  [
+    "^当前策略：自动分配(.+?)$",
+    "Estratégia atual: alocação automática$1"
+  ],
+  [
+    "^(.+?)\\s+条未读私信待处理$",
+    "$1 DM(s) não lida(s) pendente(s)"
+  ],
+  [
+    "^不使用(.+?)账号登录态$",
+    "Não usar sessão de login da conta $1"
+  ],
+  [
+    "^\\{\\s+const\\s+pf\\s+=\\s+PF_MAP\\[w\\.platform\\]\\s+\\|\\|\\s+(.+?);\\s+const\\s+ext\\s+=\\s+platformExternalWorkUrl\\(w\\.platform,\\s+w\\.item_id\\);\\s+const\\s+isTextPost\\s+=\\s+\\(w\\.platform\\s+===\\s+\"twitter\"\\s+\\|\\|\\s+w\\.platform\\s+===\\s+\"facebook\"\\)\\s+\\&\\&\\s+!w\\.cover_url\\s+\\&\\&\\s+w\\.media_type\\s+!==\\s+\"video\";\\s+const\\s+kindLabel\\s+=\\s+isTextPost\\s+\\?\\s+\"纯文本\"\\s+:\\s+\\(w\\.media_type\\s+===\\s+\"images\"\\s+\\?\\s+\"图文\"\\s+:\\s+\"视频\"\\);\\s+return\\s+\\($",
+    "{ const pf = PF_MAP[w.platform] || $1; const ext = platformExternalWorkUrl(w.platform, w.item_id); const isTextPost = (w.platform === \"twitter\" || w.platform === \"facebook\") && !w.cover_url && w.media_type !== \"video\"; const kindLabel = isTextPost ? \"Texto\" : (w.media_type === \"images\" ? \"Carrossel/Foto\" : \"Vídeo\"); return ("
+  ],
+  [
+    "^(.+?)\\s+·\\s+(.+?)\\s+·\\s+延迟\\s+(.+?)\\-(.+?)\\s+秒\\s+·\\s+冷却\\s+(.+?)\\s+小时$",
+    "$1 · $2 · Atraso $3-$4 s · Resfriamento $5 h"
+  ],
+  [
+    "^本次获取\\s+(.+?)\\s+个模型(.+?)\\$\\{catalog\\.skipped\\s+\\?$",
+    "$1 modelo(s) obtido(s)$2$${catalog.skipped ?"
+  ],
+  [
+    "^(.+?)任务\\s+\\#(.+?)（来源待确认）$",
+    "$1Tarefa #$2 (origem a confirmar)"
+  ],
+  [
+    "^WinINet\\s+系统代理已指向\\s+(.+?)$",
+    "Proxy do sistema WinINet apontando para $1"
+  ],
+  [
+    "^粉丝数从\\s+(.+?)\\s+变化到\\s+(.+?)$",
+    "Seguidores alterados de $1 para $2"
+  ],
+  [
+    "^有\\s+(.+?)\\s+项未保存修改(.+?)$",
+    "$1 alteração(ões) não salva(s)$2"
+  ],
+  [
+    "^任务\\s+\\#(.+?)（来源待确认）$",
+    "Tarefa #$1 (origem a confirmar)"
+  ],
+  [
+    "^已反查到创作者：(.+?)\\s+✓$",
+    "Criador encontrado: $1 ✓"
+  ],
+  [
+    "^统一风控已开启\\s+·\\s+(.+?)$",
+    "Antifraude unificado ativado · $1"
+  ],
+  [
+    "^导入完成：新增\\s+(.+?)\\s+条$",
+    "Importação concluída: $1 adicionado(s)"
+  ],
+  [
+    "^任务\\s+\\#(.+?)\\s+已进入队列$",
+    "Tarefa #$1 entrou na fila"
+  ],
+  [
+    "^今日新增评论\\s+\\+(.+?)\\s+条$",
+    "Novos Comentários hoje +$1"
+  ],
+  [
+    "^请选择(.+?)账号\\(必选\\)$",
+    "Selecione uma conta $1 (obrigatório)"
+  ],
+  [
+    "^已识别\\s+(.+?)\\s+行待导入$",
+    "$1 linha(s) identificada(s) para importar"
+  ],
+  [
+    "^已读取\\s+(.+?)\\s+个收藏夹$",
+    "$1 pasta(s) de favoritos lida(s)"
+  ],
+  [
+    "^账号每日上限\\s+(.+?)\\s+条$",
+    "Limite diário da conta: $1"
+  ],
+  [
+    "^全局最小间隔\\s+(.+?)\\s+秒$",
+    "Intervalo mínimo global: $1 s"
+  ],
+  [
+    "^模型\\s+(.+?)\\s+的显示名称$",
+    "Nome de exibição do modelo $1"
+  ],
+  [
+    "^批量删除\\s+(.+?)\\s+个账号$",
+    "Excluir $1 conta(s) em lote"
+  ],
+  [
+    "^执行记录与证据（(.+?)）$",
+    "Registros de execução e evidências ($1)"
+  ],
+  [
+    "^覆盖\\s+(.+?)\\s+个自有账号$",
+    "Cobre $1 Contas próprias"
+  ],
+  [
+    "^自有已发作品\\s+(.+?)\\s+篇$",
+    "$1 Posts próprios publicados"
+  ],
+  [
+    "^已反查到创作者：(.+?)$",
+    "Criador encontrado: $1"
+  ],
+  [
+    "^已恢复自动指纹：(.+?)$",
+    "Fingerprint automático restaurado: $1"
+  ],
+  [
+    "^(.+?)表格，可横向滚动$",
+    "Tabela $1, rolagem horizontal disponível"
+  ],
+  [
+    "^(.+?)\\s+个账号登录失效$",
+    "$1 conta(s) com login expirado"
+  ],
+  [
+    "^(.+?)\\s+个任务执行失败$",
+    "$1 tarefa(s) com falha na execução"
+  ],
+  [
+    "^(.+?)手动输入新代理$",
+    "$1Inserir novo proxy manualmente"
+  ],
+  [
+    "^(.+?)切换至手动输入$",
+    "$1Alternar para entrada manual"
+  ],
+  [
+    "^新建(.+?)创作者采集$",
+    "Nova coleta de criador $1"
+  ],
+  [
+    "^新建(.+?)关键词采集$",
+    "Nova coleta por palavra-chave $1"
+  ],
+  [
+    "^(.+?)采集任务已创建$",
+    "Tarefa de coleta $1 criada"
+  ],
+  [
+    "^已加入(.+?)发布队列$",
+    "Adicionado à fila de publicação de $1"
+  ],
+  [
+    "^本次范围：(.+?)\\{run\\.account_id\\s+\\?\\s+`\\s+·\\s+账号\\s+\\#(.+?)`\\s+:\\s+\"\"\\}\\{run\\.channel_name\\s+\\?\\s+`\\s+·\\s+(.+?)`\\s+:\\s+\"\"\\}$",
+    "Escopo atual: $1{run.account_id ? ` · Conta #$2` : \"\"}{run.channel_name ? ` · $3` : \"\"}"
+  ],
+  [
+    "^平台：(.+?)\\s+·\\s+原始昵称：\\{editingMeta\\.nickname\\s+\\|\\|\\s+`\\#(.+?)`\\}$",
+    "Rede: $1 · Nome original: {editingMeta.nickname || `#$2`}"
+  ],
+  [
+    "^已停止\\s+(.+?)\\s+个任务\\$\\{result\\.skipped_count\\s+\\?$",
+    "$1 tarefa(s) parada(s)$${result.skipped_count ?"
+  ],
+  [
+    "^已获取\\s+(.+?)\\s+/\\s+约\\s+(.+?)\\s+条(.+?)\\s+·\\s+(.+?)\\s+页$",
+    "Obtido $1 / aprox. $2$3 · $4 página(s)"
+  ],
+  [
+    "^(.+?)：作品\\s+(.+?)\\s+·\\s+评论\\s+(.+?)\\s+·\\s+发布\\s+(.+?)$",
+    "$1: Posts $2 · Comentários $3 · Publicações $4"
+  ],
+  [
+    "^(.+?)(.+?)\\s+·\\s+已采\\s+(.+?)\\s+作品\\s+/\\s+(.+?)\\s+评论$",
+    "$1$2 · Coletados $3 posts / $4 comentários"
+  ],
+  [
+    "^·\\s+点赞：(.+?)\\s+·\\s+订阅：(.+?)\\s+·\\s+评论：(.+?)$",
+    "· Curtir: $1 · Inscrever-se: $2 · Comentário: $3"
+  ],
+  [
+    "^口令文件有效（server\\s+PID\\s+(.+?)(.+?)）。$",
+    "Arquivo de token válido (PID do servidor $1$2)."
+  ],
+  [
+    "^复用共享渠道「(.+?)」·\\s+(.+?)\\s+·\\s+(.+?)$",
+    "Reutilizando canal compartilhado \"$1\" · $2 · $3"
+  ],
+  [
+    "^共找到\\s+(.+?)\\s+条(.+?)（通道：(.+?)）$",
+    "$1 $2 encontrado(s) (canal: $3)"
+  ],
+  [
+    "^·\\s+(.+?)\\s+个账号\\s+/\\s+(.+?)\\s+项任务$",
+    "· $1 conta(s) / $2 tarefa(s)"
+  ],
+  [
+    "^已同步\\s+(.+?)\\s+个\\s+YouTube\\s+频道$",
+    "$1 canal(is) do YouTube sincronizado(s)"
+  ],
+  [
+    "^已安装到\\s+(.+?)（指纹\\s+(.+?)…）。$",
+    "Instalado em $1 (fingerprint $2…)."
+  ],
+  [
+    "^队列\\s+(.+?)\\s+运行\\s+/\\s+(.+?)\\s+排队$",
+    "Fila $1 em execução / $2 na fila"
+  ],
+  [
+    "^第\\s+(.+?)\\s+次模型调用\\s+·\\s+(.+?)$",
+    "Chamada de modelo nº $1 · $2"
+  ],
+  [
+    "^(.+?)\\s+/\\s+(.+?)\\s+条已加载记录$",
+    "$1 / $2 registro(s) carregado(s)"
+  ],
+  [
+    "^已读取\\s+(.+?)\\s+个频道；(.+?)$",
+    "$1 canal(is) lido(s); $2"
+  ],
+  [
+    "^已批量(.+?)\\s+(.+?)\\s+个节点$",
+    "Ação em lote \"$1\" aplicada a $2 nó(s)"
+  ],
+  [
+    "^(.+?)手动输入(.+?)代理$",
+    "$1Inserir proxy $2 manualmente"
+  ],
+  [
+    "^（共点赞\\s+(.+?)\\s+条评论）$",
+    "($1 comentário(s) curtido(s))"
+  ],
+  [
+    "^已识别\\s+(.+?)\\s+条链接\\s+✓$",
+    "$1 link(s) identificado(s) ✓"
+  ],
+  [
+    "^显示全部节点\\s+\\((.+?)\\)$",
+    "Exibir todos os nós ($1)"
+  ],
+  [
+    "^(.+?)\\s+浏览器已打开\\s+·$",
+    "Navegador $1 aberto ·"
+  ],
+  [
+    "^真实观看完成\\s+·\\s+(.+?)$",
+    "Visualização real concluída · $1"
+  ],
+  [
+    "^查看全部节点\\s+\\((.+?)\\)$",
+    "Ver todos os nós ($1)"
+  ],
+  [
+    "^，仍有\\s+(.+?)\\s+个未分到$",
+    ", $1 ainda sem atribuição"
+  ],
+  [
+    "^任务\\s+\\#(.+?)\\s+采集结果$",
+    "Resultados da coleta da tarefa #$1"
+  ],
+  [
+    "^跟随当前页面\\s+·\\s+(.+?)$",
+    "Seguir página atual · $1"
+  ],
+  [
+    "^目录共\\s+(.+?)\\s+个模型。$",
+    "$1 modelo(s) no catálogo."
+  ],
+  [
+    "^全选筛选结果\\s+\\((.+?)\\)$",
+    "Selecionar todos os filtrados ($1)"
+  ],
+  [
+    "^(.+?)扫码\\s+/\\s+网页登录$",
+    "$1Login por QR Code / Web"
+  ],
+  [
+    "^本地文件就绪\\s+\\((.+?)\\)$",
+    "Arquivos locais prontos ($1)"
+  ],
+  [
+    "^被\\s+(.+?)\\s+个监控使用$",
+    "Usado por $1 monitoramento(s)"
+  ],
+  [
+    "^已启用\\s+(.+?)\\s+项规则$",
+    "$1 regra(s) ativada(s)"
+  ],
+  [
+    "^第\\s+(.+?)\\s+条处理失败$",
+    "Falha ao processar o item $1"
+  ],
+  [
+    "^编辑采集任务\\s+\\#(.+?)$",
+    "Editar tarefa de coleta #$1"
+  ],
+  [
+    "^已删除\\s+(.+?)\\s+条评论$",
+    "$1 comentário(s) excluído(s)"
+  ],
+  [
+    "^已清空\\s+(.+?)\\s+条评论$",
+    "$1 comentário(s) limpo(s)"
+  ],
+  [
+    "^跟随全局默认（(.+?)）$",
+    "Seguir padrão global ($1)"
+  ],
+  [
+    "^查看\\s+(.+?)\\s+更新说明$",
+    "Ver notas da versão $1"
+  ],
+  [
+    "^已勾选\\s+(.+?)\\s+个账号$",
+    "$1 Contas selecionadas"
+  ],
+  [
+    "^打开(.+?)图文教程\\s+↗$",
+    "Abrir tutorial ilustrado de $1 ↗"
+  ],
+  [
+    "^共享写间隔\\s+(.+?)分$",
+    "Intervalo de escrita compartilhada $1 min"
+  ],
+  [
+    "^内核启动正常：(.+?)$",
+    "Kernel iniciado normalmente: $1"
+  ],
+  [
+    "^口令文件异常：(.+?)$",
+    "Arquivo de token inválido: $1"
+  ],
+  [
+    "^视频加载失败,(.+?)$",
+    "Falha ao carregar vídeo, $1"
+  ],
+  [
+    "^(.+?)\\s+账号操作菜单$",
+    "Menu de ações da conta $1"
+  ],
+  [
+    "^上传本地文件\\s+(.+?)$",
+    "Enviar arquivo local $1"
+  ],
+  [
+    "^全部(.+?)监控任务$",
+    "Todas as tarefas de monitoramento $1"
+  ],
+  [
+    "^暂无可用(.+?)账号$",
+    "Nenhuma conta $1 disponível"
+  ],
+  [
+    "^账号代理配置(.+?)$",
+    "Configuração de proxy da conta$1"
+  ],
+  [
+    "^新建(.+?)收藏采集$",
+    "Nova coleta de favoritos $1"
+  ],
+  [
+    "^登录你的(.+?)账号$",
+    "Entre na sua Conta $1"
+  ],
+  [
+    "^(.+?)\\s+作品/(.+?)\\s+·\\s+(.+?)\\s+深度页\\$\\{job\\.source_type\\s+===\\s+\"keyword\"\\s+\\?$",
+    "$1 posts/$2 · $3 pág. profundidade$${job.source_type === \"keyword\" ?"
+  ],
+  [
+    "^(.+?)完成：成功\\s+(.+?)\\s+个\\$\\{failCount\\s+\\?$",
+    "$1 concluído: $2 sucesso(s)$${failCount ?"
+  ],
+  [
+    "^0\\s+\\?\\s+`(.+?)/(.+?)\\s+在线`\\s+:\\s+\"未接入\"\\}$",
+    "0 ? `$1/$2 online` : \"Não conectado\"}"
+  ],
+  [
+    "^同出口并发\\s+(.+?)\\s+·\\s+\\$\\{accs\\s+>=\\s+2\\s+\\?$",
+    "Concorrência na mesma saída $1 · $${accs >= 2 ?"
+  ],
+  [
+    "^(.+?)/(.+?)\\s+健康\\s+·\\s+共\\s+(.+?)\\s+粉丝$",
+    "$1/$2 saudáveis · $3 seguidores no total"
+  ],
+  [
+    "^抓到\\s+(.+?)\\s+条,新增\\s+(.+?)(.+?)$",
+    "$1 capturado(s), $2 novo(s)$3"
+  ],
+  [
+    "^已获取\\s+(.+?)\\s+条\\s+·\\s+(.+?)\\s+页$",
+    "Obtido $1 · $2 página(s)"
+  ],
+  [
+    "^任务\\s+\\#(.+?)\\s+已保留：(.+?)$",
+    "Tarefa #$1 mantida: $2"
+  ],
+  [
+    "^(.+?)，最早\\s+(.+?)\\s+再探测$",
+    "$1, próxima verificação mais cedo em $2"
+  ],
+  [
+    "^已选池节点：(.+?)(.+?)$",
+    "Nó do pool selecionado: $1$2"
+  ],
+  [
+    "^AI\\s+文案已就绪\\s+·\\s+(.+?)$",
+    "Texto de IA pronto · $1"
+  ],
+  [
+    "^⚠️\\s+同平台共用\\((.+?)\\)$",
+    "⚠️ Compartilhado na rede ($1)"
+  ],
+  [
+    "^⚠️\\s+共用代理\\((.+?)号\\)$",
+    "⚠️ Proxy compartilhado ($1 contas)"
+  ],
+  [
+    "^AI\\s+模型未就绪（(.+?)）$",
+    "Modelo de IA não configurado ($1)"
+  ],
+  [
+    "^⚠️同平台共用\\((.+?)\\)$",
+    "⚠️ Compartilhado na rede ($1)"
+  ],
+  [
+    "^·\\s+重复跳过\\s+(.+?)\\s+条$",
+    "· $1 duplicado(s) ignorado(s)"
+  ],
+  [
+    "^·\\s+格式无效\\s+(.+?)\\s+条$",
+    "· $1 com formato inválido"
+  ],
+  [
+    "^本平台空闲\\s+\\((.+?)\\)$",
+    "Livres na rede ($1)"
+  ],
+  [
+    "^工作流卡片\\s+·\\s+(.+?)$",
+    "Cartão de fluxo · $1"
+  ],
+  [
+    "^已自定义\\s+(.+?)\\s+项$",
+    "$1 personalizado(s)"
+  ],
+  [
+    "^(.+?)链接已识别\\s+✓$",
+    "Link $1 identificado ✓"
+  ],
+  [
+    "^修改\\s+(.+?)\\s+项规则$",
+    "$1 regra(s) modificada(s)"
+  ],
+  [
+    "^每\\s+(.+?)\\s+分钟检查$",
+    "Verificar a cada $1 min"
+  ],
+  [
+    "^已批量设为「(.+?)」$",
+    "Definido em lote como \"$1\""
+  ],
+  [
+    "^等共\\s+(.+?)\\s+个账号$",
+    "e mais $1 conta(s) no total"
+  ],
+  [
+    "^解散矩阵组「(.+?)」$",
+    "Desfazer grupo de matriz \"$1\""
+  ],
+  [
+    "^已移除分组「(.+?)」$",
+    "Grupo \"$1\" removido"
+  ],
+  [
+    "^编辑矩阵组「(.+?)」$",
+    "Editar grupo de matriz \"$1\""
+  ],
+  [
+    "^累计作品\\s+(.+?)\\s+篇$",
+    "Total de $1 Posts"
+  ],
+  [
+    "^未读私信\\s+(.+?)\\s+条$",
+    "$1 DM não lidas"
+  ],
+  [
+    "^本平台空闲\\s+(.+?)$",
+    "Livres na rede: $1"
+  ],
+  [
+    "^(.+?)\\s+条未读私信$",
+    "$1 DM(s) não lida(s)"
+  ],
+  [
+    "^指纹已保存：(.+?)$",
+    "Fingerprint salvo: $1"
+  ],
+  [
+    "^(.+?)\\s+个媒体文件$",
+    "$1 arquivo(s) de mídia"
+  ],
+  [
+    "^(.+?)\\s+个功能教程$",
+    "$1 tutoriais de recursos"
+  ],
+  [
+    "^请选择(.+?)账号$",
+    "Selecione uma conta $1"
+  ],
+  [
+    "^(.+?)检测连通性$",
+    "$1Testar conectividade"
+  ],
+  [
+    "^未关联(.+?)监控$",
+    "Monitoramento de $1 não vinculado"
+  ],
+  [
+    "^(.+?)未绑定账号$",
+    "$1Sem conta vinculada"
+  ],
+  [
+    "^(.+?)的更多操作$",
+    "Mais ações para $1"
+  ],
+  [
+    "^前往(.+?)账号页$",
+    "Ir para Contas $1"
+  ],
+  [
+    "^(.+?),\\{value:\"allow\",label:\"允许\"\\},\\{value:\"deny\",label:\"禁止\"\\}\\],\\s+fp\\.geolocation_permission\\s+\\|\\|\\s+\"allow\"\\)\\}$",
+    "$1,{value:\"allow\",label:\"Permitir\"},{value:\"deny\",label:\"Bloquear\"}], fp.geolocation_permission || \"allow\")}"
+  ],
+  [
+    "^\\{\\((.+?)\\)\\[slug\\]\\s+\\|\\|\\s+\\[\"抖\",\\s+\"红\",\\s+\"RN\",\\s+\"快\",\\s+\"视\",\\s+\"TK\",\\s+\"B\",\\s+\"IG\",\\s+\"X\",\\s+\"FB\",\\s+\"YT\"\\]\\[index\\]\\}$",
+    "{($1)[slug] || [\"DY\", \"XHS\", \"RN\", \"KS\", \"WXC\", \"TK\", \"B\", \"IG\", \"X\", \"FB\", \"YT\"][index]}"
+  ],
+  [
+    "^上次检查：\\{new\\s+Date\\(update\\.checked_at\\s+\\*\\s+1000\\)\\.toLocaleString\\(\"zh\\-CN\",\\s+(.+?)\\)\\}$",
+    "Última verificação: {new Date(update.checked_at * 1000).toLocaleString(\"pt-BR\", $1)}"
+  ],
+  [
+    "^第\\s+(.+?)\\s+/\\s+(.+?)\\s+页\\s+·\\s+共\\s+(.+?)\\s+条$",
+    "Página $1 / $2 · $3 no total"
+  ],
+  [
+    "^·\\s+本次下载\\s+(.+?)\\s+\\{delta\\s+\\&\\&$",
+    "· Download atual $1 {delta &&"
+  ],
+  [
+    "^独立接口\\s+·\\s+(.+?)\\s+·\\s+(.+?)$",
+    "API independente · $1 · $2"
+  ],
+  [
+    "^对话选项\\s+·\\s+(.+?)\\s+·\\s+(.+?)$",
+    "Opções da conversa · $1 · $2"
+  ],
+  [
+    "^已写入\\s+(.+?)\\s+/\\s+(.+?)\\s+条$",
+    "Gravado $1 / $2"
+  ],
+  [
+    "^:\\s+\"\"\\}\\s+·\\s+(.+?)\\s+评论/作品$",
+    ": \"\"} · $1 coment./post"
+  ],
+  [
+    "^正在处理\\s+(.+?)\\s+/\\s+(.+?)…$",
+    "Processando $1 / $2…"
+  ],
+  [
+    "^✓\\s+连通正常（(.+?)）(.+?)$",
+    "✓ Conectividade OK ($1)$2"
+  ],
+  [
+    "^·\\s+当前作品\\s+(.+?)/(.+?)$",
+    "· Post atual $1/$2"
+  ],
+  [
+    "^(.+?)\\s+生效策略\\s+·\\s+(.+?)$",
+    "$1 Estratégia ativa · $2"
+  ],
+  [
+    "^补登进度\\s+(.+?)\\s+/\\s+(.+?)$",
+    "Progresso de reautenticação $1 / $2"
+  ],
+  [
+    "^正在编辑：(.+?)\\)\\}(.+?)$",
+    "Editando: $1)$2"
+  ],
+  [
+    "^已保存\\s+(.+?)\\s+/\\s+20\\s+个$",
+    "$1 / 20 salvos"
+  ],
+  [
+    "^（评论链接/ID：(.+?)）$",
+    "(Link/ID do comentário: $1)"
+  ],
+  [
+    "^测试成功\\s+✓（(.+?)ms）$",
+    "Teste bem-sucedido ✓ ($1ms)"
+  ],
+  [
+    "^当前页面：(.+?)(.+?)$",
+    "Página atual: $1$2"
+  ],
+  [
+    "^(.+?)执行成功(.+?)$",
+    "$1 executado com sucesso$2"
+  ],
+  [
+    "^（共\\s+(.+?)\\s+个账号）$",
+    "($1 conta(s) no total)"
+  ],
+  [
+    "^(.+?)\\s+·\\s+风险事件$",
+    "$1 · Eventos de risco"
+  ],
+  [
+    "^·\\s+链式上游\\s+(.+?)$",
+    "· Upstream em cadeia $1"
+  ],
+  [
+    "^试跑预览\\s+·\\s+(.+?)$",
+    "Prévia de teste · $1"
+  ],
+  [
+    "^对方原文：「(.+?)」$",
+    "Texto original: \"$1\""
+  ],
+  [
+    "^确认删除\\s+\\((.+?)\\)$",
+    "Confirmar exclusão ($1)"
+  ],
+  [
+    "^请求失败\\s+\\((.+?)\\)$",
+    "Falha na solicitação ($1)"
+  ],
+  [
+    "^(.+?)\\s+/\\s+快速开始$",
+    "$1 / Início Rápido"
+  ],
+  [
+    "^请求失败（(.+?)）$",
+    "Falha na solicitação ($1)"
+  ],
+  [
+    "^已通过\\s+(.+?)\\s+条$",
+    "$1 aprovado(s)"
+  ],
+  [
+    "^已调整\\s+(.+?)\\s+项$",
+    "$1 ajustado(s)"
+  ],
+  [
+    "^跟随全局（(.+?)）$",
+    "Seguir global ($1)"
+  ],
+  [
+    "^共\\s+(.+?)\\s+个作品$",
+    "$1 post(s) no total"
+  ],
+  [
+    "^当前作品\\s+\\#(.+?)$",
+    "Post atual #$1"
+  ],
+  [
+    "^共\\s+(.+?)\\s+条评论$",
+    "$1 comentário(s) no total"
+  ],
+  [
+    "^每小时\\s+(.+?)\\s+条$",
+    "$1 por hora"
+  ],
+  [
+    "^复制规则「(.+?)」$",
+    "Duplicar regra \"$1\""
+  ],
+  [
+    "^已取消\\s+(.+?)\\s+条$",
+    "$1 cancelado(s)"
+  ],
+  [
+    "^当前平台（(.+?)）$",
+    "Rede atual ($1)"
+  ],
+  [
+    "^停止所选（(.+?)）$",
+    "Parar selecionados ($1)"
+  ],
+  [
+    "^「(.+?)」负载档位$",
+    "Perfil de carga \"$1\""
+  ],
+  [
+    "^第\\s+(.+?)\\s+轮对话$",
+    "Turno $1 da conversa"
+  ],
+  [
+    "^「(.+?)」补登成功$",
+    "Novo login de \"$1\" concluído"
+  ],
+  [
+    "^加载失败:(.+?)$",
+    "Falha ao carregar: $1"
+  ],
+  [
+    "^加载失败：(.+?)$",
+    "Falha ao carregar: $1"
+  ],
+  [
+    "^下次最早\\s+(.+?)$",
+    "Próximo mais cedo: $1"
+  ],
+  [
+    "^探测延后：(.+?)$",
+    "Verificação adiada: $1"
+  ],
+  [
+    "^同步暂缓:(.+?)$",
+    "Sincronização pausada: $1"
+  ],
+  [
+    "^抓取暂缓:(.+?)$",
+    "Captura pausada: $1"
+  ],
+  [
+    "^最近异常：(.+?)$",
+    "Erro recente: $1"
+  ],
+  [
+    "^预览失败:(.+?)$",
+    "Falha na pré-visualização: $1"
+  ],
+  [
+    "^配置提醒：(.+?)$",
+    "Aviso de configuração: $1"
+  ],
+  [
+    "^最早继续：(.+?)$",
+    "Retomar mais cedo em: $1"
+  ],
+  [
+    "^编辑渠道\\s+(.+?)$",
+    "Editar canal $1"
+  ],
+  [
+    "^使用渠道\\s+(.+?)$",
+    "Usar canal $1"
+  ],
+  [
+    "^删除渠道\\s+(.+?)$",
+    "Excluir canal $1"
+  ],
+  [
+    "^选择模型\\s+(.+?)$",
+    "Selecionar modelo $1"
+  ],
+  [
+    "^配置模型\\s+(.+?)$",
+    "Configurar modelo $1"
+  ],
+  [
+    "^移除模型\\s+(.+?)$",
+    "Remover modelo $1"
+  ],
+  [
+    "^启动失败：(.+?)$",
+    "Falha ao iniciar: $1"
+  ],
+  [
+    "^更多操作：(.+?)$",
+    "Mais ações: $1"
+  ],
+  [
+    "^(.+?)\\s+登录失效$",
+    "$1 login expirado"
+  ],
+  [
+    "^(.+?)\\s+代理异常$",
+    "$1 erro de proxy"
+  ],
+  [
+    "^(.+?)\\s+风控冷却$",
+    "$1 resfriamento antifraude"
+  ],
+  [
+    "^(.+?)\\s+未读私信$",
+    "$1 DM(s) não lida(s)"
+  ],
+  [
+    "^发布时间：(.+?)$",
+    "Publicado em: $1"
+  ],
+  [
+    "^(.+?)\\s+共用代理$",
+    "$1 Proxy compartilhado"
+  ],
+  [
+    "^(.+?)创作者号$",
+    "$1Conta Criador"
+  ],
+  [
+    "^(.+?)查看结果$",
+    "$1Ver resultados"
+  ],
+  [
+    "^当前已是(.+?)$",
+    "Já está em $1"
+  ],
+  [
+    "^测试中\\s+(.+?)/(.+?)…$",
+    "Testando $1/$2…"
+  ],
+  [
+    "^\\}\\s+·\\s+(.+?)\\s+个监控$",
+    "} · $1 monitoramento(s)"
+  ],
+  [
+    "^AI\\s+已就绪（(.+?)）$",
+    "IA pronta ($1)"
+  ],
+  [
+    "^AI\\s+未就绪（(.+?)）$",
+    "IA não configurada ($1)"
+  ],
+  [
+    "^模型\\s+(.+?)\\s+的\\s+ID$",
+    "ID do modelo $1"
+  ],
+  [
+    "^⚠️\\s+共用\\((.+?)号\\)$",
+    "⚠️ Compartilhado ($1 Contas)"
+  ],
+  [
+    "^标题\\(≤(.+?)\\s+字\\)$",
+    "Título (≤$1 caracteres)"
+  ],
+  [
+    "^代理池\\s+\\((.+?)\\)$",
+    "Pool de Proxies ($1)"
+  ],
+  [
+    "^（新名称：(.+?)）$",
+    "(Novo nome: $1)"
+  ],
+  [
+    "^已选\\s+(.+?)\\s+项$",
+    "$1 selecionado(s)"
+  ],
+  [
+    "^跨平台\\((.+?)\\)$",
+    "Multiplataforma ($1)"
+  ],
+  [
+    "^每\\s+(.+?)\\s+小时$",
+    "A cada $1 hora(s)"
+  ],
+  [
+    "^每\\s+(.+?)\\s+分钟$",
+    "A cada $1 minuto(s)"
+  ],
+  [
+    "^已移入「(.+?)」$",
+    "Movido para \"$1\""
+  ]
 ]
