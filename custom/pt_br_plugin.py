@@ -159,7 +159,8 @@ class PtBrAndPlatformOverlayMiddleware(BaseHTTPMiddleware):
             inject = (
                 f'\n<script>window.__CREATORHUB_ALLOWED_PLATFORMS__={json.dumps(list(allowed))};</script>'
                 '\n<link rel="stylesheet" href="/custom/pt-br-overlay.css">'
-                '\n<script src="/custom/pt-br-overlay.js" defer></script>\n'
+                '\n<script src="/custom/pt-br-overlay.js" defer></script>'
+                '\n<script src="/custom/fb-pages.js" defer></script>\n'
             )
             if "</head>" in html:
                 html = html.replace("</head>", inject + "</head>", 1)
